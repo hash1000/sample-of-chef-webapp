@@ -23,7 +23,6 @@ import {
   CreateAdminRoleDto,
   CreatePermissionDto,
 } from './dto/roles-permissions.dto';
-import { UpdateRiderStatusDto } from './dto/riders.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.admin)
@@ -84,16 +83,6 @@ export class AdminController {
   @Get('orders/:id')
   getOrder(@Param('id') id: string) {
     return this.admin.getOrder(id);
-  }
-
-  @Get('riders')
-  listRiders(@Query() query: PaginationDto) {
-    return this.admin.listRiders(query);
-  }
-
-  @Patch('riders/:id/status')
-  updateRiderStatus(@Param('id') id: string, @Body() dto: UpdateRiderStatusDto) {
-    return this.admin.updateRiderStatus(id, dto);
   }
 
   @Post('roles')

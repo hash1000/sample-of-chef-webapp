@@ -23,7 +23,6 @@ const orders_filter_dto_1 = require("./dto/orders-filter.dto");
 const pagination_dto_1 = require("./dto/pagination.dto");
 const restaurants_dto_1 = require("./dto/restaurants.dto");
 const roles_permissions_dto_1 = require("./dto/roles-permissions.dto");
-const riders_dto_1 = require("./dto/riders.dto");
 let AdminController = class AdminController {
     admin;
     constructor(admin) {
@@ -61,12 +60,6 @@ let AdminController = class AdminController {
     }
     getOrder(id) {
         return this.admin.getOrder(id);
-    }
-    listRiders(query) {
-        return this.admin.listRiders(query);
-    }
-    updateRiderStatus(id, dto) {
-        return this.admin.updateRiderStatus(id, dto);
     }
     createRole(dto) {
         return this.admin.createAdminRole(dto);
@@ -166,21 +159,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "getOrder", null);
-__decorate([
-    (0, common_1.Get)('riders'),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pagination_dto_1.PaginationDto]),
-    __metadata("design:returntype", void 0)
-], AdminController.prototype, "listRiders", null);
-__decorate([
-    (0, common_1.Patch)('riders/:id/status'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, riders_dto_1.UpdateRiderStatusDto]),
-    __metadata("design:returntype", void 0)
-], AdminController.prototype, "updateRiderStatus", null);
 __decorate([
     (0, common_1.Post)('roles'),
     __param(0, (0, common_1.Body)()),

@@ -17,7 +17,6 @@ export declare class AuthService {
             id: string;
             role: import("@prisma/client").$Enums.Role;
             isBlocked: boolean;
-            riderStatus: import("@prisma/client").$Enums.RiderStatus | null;
             adminRoleId: string | null;
             createdAt: Date;
             updatedAt: Date;
@@ -31,7 +30,6 @@ export declare class AuthService {
             id: string;
             role: import("@prisma/client").$Enums.Role;
             isBlocked: boolean;
-            riderStatus: import("@prisma/client").$Enums.RiderStatus | null;
             adminRoleId: string | null;
             createdAt: Date;
             updatedAt: Date;

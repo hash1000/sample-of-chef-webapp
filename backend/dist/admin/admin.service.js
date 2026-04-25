@@ -61,7 +61,6 @@ let AdminService = class AdminService {
                     email: true,
                     role: true,
                     isBlocked: true,
-                    riderStatus: true,
                     createdAt: true,
                 },
             }),
@@ -198,50 +197,6 @@ let AdminService = class AdminService {
         if (!order)
             throw new common_1.NotFoundException('Order not found');
         return order;
-    }
-    async listRiders(query) {
-        const { limit, skip, page } = paginate(query);
-        const q = query.q?.trim();
-        const where = {
-            role: client_1.Role.rider,
-            ...(q
-                ? {
-                    OR: [
-                        { name: { contains: q, mode: 'insensitive' } },
-                        { email: { contains: q, mode: 'insensitive' } },
-                    ],
-                }
-                : {}),
-        };
-        const [items, total] = await Promise.all([
-            this.prisma.user.findMany({
-                where,
-                orderBy: { createdAt: 'desc' },
-                skip,
-                take: limit,
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    riderStatus: true,
-                    createdAt: true,
-                },
-            }),
-            this.prisma.user.count({ where }),
-        ]);
-        return { page, limit, total, items };
-    }
-    async updateRiderStatus(id, dto) {
-        const rider = await this.prisma.user.findUnique({ where: { id } });
-        if (!rider)
-            throw new common_1.NotFoundException('Rider not found');
-        if (rider.role !== client_1.Role.rider)
-            throw new common_1.BadRequestException('User is not a rider');
-        return this.prisma.user.update({
-            where: { id },
-            data: { riderStatus: dto.status ?? client_1.RiderStatus.offline },
-            select: { id: true, riderStatus: true },
-        });
     }
     async createAdminRole(dto) {
         return this.prisma.adminRole.create({ data: { name: dto.name.trim() } });

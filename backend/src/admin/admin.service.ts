@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { OrderStatus, Role, RiderStatus } from '@prisma/client';
+import { OrderStatus, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminOrdersFilterDto } from './dto/orders-filter.dto';
 import { PaginationDto } from './dto/pagination.dto';
@@ -10,7 +10,6 @@ import {
   CreateAdminRoleDto,
   CreatePermissionDto,
 } from './dto/roles-permissions.dto';
-import { UpdateRiderStatusDto } from './dto/riders.dto';
 
 function paginate(q: PaginationDto) {
   const page = Math.max(1, q.page ?? 1);
@@ -64,7 +63,6 @@ export class AdminService {
           email: true,
           role: true,
           isBlocked: true,
-          riderStatus: true,
           createdAt: true,
         },
       }),
@@ -208,53 +206,6 @@ export class AdminService {
     });
     if (!order) throw new NotFoundException('Order not found');
     return order;
-  }
-
-  async listRiders(query: PaginationDto) {
-    const { limit, skip, page } = paginate(query);
-    const q = query.q?.trim();
-
-    const where: any = {
-      role: Role.rider,
-      ...(q
-        ? {
-            OR: [
-              { name: { contains: q, mode: 'insensitive' as const } },
-              { email: { contains: q, mode: 'insensitive' as const } },
-            ],
-          }
-        : {}),
-    };
-
-    const [items, total] = await Promise.all([
-      this.prisma.user.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          riderStatus: true,
-          createdAt: true,
-        },
-      }),
-      this.prisma.user.count({ where }),
-    ]);
-
-    return { page, limit, total, items };
-  }
-
-  async updateRiderStatus(id: string, dto: UpdateRiderStatusDto) {
-    const rider = await this.prisma.user.findUnique({ where: { id } });
-    if (!rider) throw new NotFoundException('Rider not found');
-    if (rider.role !== Role.rider) throw new BadRequestException('User is not a rider');
-    return this.prisma.user.update({
-      where: { id },
-      data: { riderStatus: dto.status ?? RiderStatus.offline },
-      select: { id: true, riderStatus: true },
-    });
   }
 
   async createAdminRole(dto: CreateAdminRoleDto) {

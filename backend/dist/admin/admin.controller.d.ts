@@ -3,7 +3,6 @@ import { AdminOrdersFilterDto } from './dto/orders-filter.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { CreateRestaurantDto, UpdateRestaurantDto } from './dto/restaurants.dto';
 import { AssignPermissionsToRoleDto, AssignRoleToUserDto, CreateAdminRoleDto, CreatePermissionDto } from './dto/roles-permissions.dto';
-import { UpdateRiderStatusDto } from './dto/riders.dto';
 export declare class AdminController {
     private readonly admin;
     constructor(admin: AdminService);
@@ -23,7 +22,6 @@ export declare class AdminController {
             id: string;
             role: import("@prisma/client").$Enums.Role;
             isBlocked: boolean;
-            riderStatus: import("@prisma/client").$Enums.RiderStatus | null;
             createdAt: Date;
         }[];
     }>;
@@ -169,22 +167,6 @@ export declare class AdminController {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
-    }>;
-    listRiders(query: PaginationDto): Promise<{
-        page: number;
-        limit: number;
-        total: number;
-        items: {
-            name: string;
-            email: string;
-            id: string;
-            riderStatus: import("@prisma/client").$Enums.RiderStatus | null;
-            createdAt: Date;
-        }[];
-    }>;
-    updateRiderStatus(id: string, dto: UpdateRiderStatusDto): Promise<{
-        id: string;
-        riderStatus: import("@prisma/client").$Enums.RiderStatus | null;
     }>;
     createRole(dto: CreateAdminRoleDto): Promise<{
         name: string;

@@ -73,7 +73,32 @@ export declare class ChefService {
         updatedAt: Date;
         restaurantId: string | null;
     }>;
-    updateOrderStatus(chefId: string, orderId: string, dto: UpdateChefOrderStatusDto): Promise<{
+    updateOrderStatus(chefId: string, orderId: string, dto: UpdateChefOrderStatusDto): Promise<({
+        user: {
+            name: string;
+            email: string;
+            id: string;
+        };
+        payment: {
+            status: import("@prisma/client").$Enums.PaymentStatus;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            orderId: string;
+            provider: string;
+            stripeIntentId: string | null;
+            amount: number;
+            currency: string;
+        } | null;
+        items: {
+            name: string;
+            id: string;
+            orderId: string;
+            quantity: number;
+            unitPrice: number;
+            lineTotal: number;
+        }[];
+    } & {
         status: import("@prisma/client").$Enums.OrderStatus;
         userId: string;
         total: number;
@@ -83,7 +108,7 @@ export declare class ChefService {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
-    }>;
+    }) | null>;
     listMenu(chefId: string): Promise<{
         name: string;
         description: string | null;

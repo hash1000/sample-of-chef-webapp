@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { MenuItem, OrderStatus, Role } from '@prisma/client';
+import { MenuItem, OrderStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChefOrdersQueryDto } from './dto/chef-orders-query.dto';
 import { CreateMenuItemDto, ToggleAvailabilityDto, UpdateMenuItemDto } from './dto/menu.dto';
@@ -70,25 +70,36 @@ export class ChefService {
 
   async updateOrderStatus(chefId: string, orderId: string, dto: UpdateChefOrderStatusDto) {
     const restaurant = await this.getChefRestaurantOrThrow(chefId);
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
-    if (!order) throw new NotFoundException('Order not found');
-    if (order.restaurantId !== restaurant.id) throw new ForbiddenException('Forbidden');
+    const desired = dto.status;
 
-    const from = order.status;
-    const to = dto.status as any as OrderStatus;
+    // Core rule (NO rider): when chef marks "ready", system finalizes as "delivered".
+    // We enforce atomic transitions by updating with an expected current status.
+    const transition =
+      desired === 'accepted'
+        ? { from: OrderStatus.pending, to: OrderStatus.accepted }
+        : desired === 'preparing'
+          ? { from: OrderStatus.accepted, to: OrderStatus.preparing }
+          : { from: OrderStatus.preparing, to: OrderStatus.delivered }; // desired === 'ready'
 
-    const allowed =
-      (from === OrderStatus.pending && to === OrderStatus.accepted) ||
-      (from === OrderStatus.accepted && to === OrderStatus.preparing) ||
-      (from === OrderStatus.preparing && to === OrderStatus.ready);
+    const updated = await this.prisma.order.updateMany({
+      where: {
+        id: orderId,
+        restaurantId: restaurant.id,
+        status: transition.from,
+      },
+      data: { status: transition.to },
+    });
 
-    if (!allowed) {
-      throw new BadRequestException(`Invalid status transition: ${from} -> ${to}`);
+    if (updated.count !== 1) {
+      const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+      if (!order) throw new NotFoundException('Order not found');
+      if (order.restaurantId !== restaurant.id) throw new ForbiddenException('Forbidden');
+      throw new BadRequestException(`Invalid status transition: ${order.status} -> ${transition.to}`);
     }
 
-    return this.prisma.order.update({
+    return this.prisma.order.findUnique({
       where: { id: orderId },
-      data: { status: to },
+      include: { user: { select: { id: true, name: true, email: true } }, items: true, payment: true },
     });
   }
 

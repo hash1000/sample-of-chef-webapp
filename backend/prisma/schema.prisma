@@ -10,7 +10,6 @@ datasource db {
 enum Role {
   user
   chef
-  rider
   admin
 }
 
@@ -19,13 +18,7 @@ enum OrderStatus {
   accepted
   preparing
   ready
-  picked
   delivered
-}
-
-enum RiderStatus {
-  online
-  offline
 }
 
 enum PaymentStatus {
@@ -44,7 +37,6 @@ model User {
   passwordHash String
   role         Role     @default(user)
   isBlocked    Boolean  @default(false)
-  riderStatus  RiderStatus?
   adminRoleId  String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

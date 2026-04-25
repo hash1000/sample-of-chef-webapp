@@ -21,7 +21,7 @@ exports.ChefOrdersQueryDto = ChefOrdersQueryDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsIn)(['pending', 'accepted', 'preparing', 'ready', 'completed']),
+    (0, class_validator_1.IsIn)(['pending', 'accepted', 'preparing', 'completed']),
     __metadata("design:type", String)
 ], ChefOrdersQueryDto.prototype, "status", void 0);
 __decorate([
