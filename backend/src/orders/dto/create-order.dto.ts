@@ -3,6 +3,7 @@ import {
   IsArray,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Min,
   ValidateNested,
@@ -25,6 +26,11 @@ class CreateOrderItemDto {
 }
 
 export class CreateOrderDto {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  restaurantId?: string;
+
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })

@@ -66,9 +66,27 @@ model Restaurant {
   updatedAt   DateTime @updatedAt
 
   chef        User?    @relation("ChefRestaurants", fields: [chefId], references: [id])
+  menuItems   MenuItem[]
   orders      Order[]
 
   @@index([chefId])
+}
+
+model MenuItem {
+  id           String   @id @default(uuid())
+  restaurantId String
+  name         String
+  priceCents   Int
+  category     String
+  description  String?
+  isAvailable  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@index([restaurantId, category])
 }
 
 model Order {

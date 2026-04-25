@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const admin_module_1 = require("./admin/admin.module");
 const auth_module_1 = require("./auth/auth.module");
+const chef_module_1 = require("./chef/chef.module");
 const orders_module_1 = require("./orders/orders.module");
 const users_module_1 = require("./users/users.module");
 let AppModule = class AppModule {
@@ -26,6 +27,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             orders_module_1.OrdersModule,
             admin_module_1.AdminModule,
+            chef_module_1.ChefModule,
         ],
     })
 ], AppModule);

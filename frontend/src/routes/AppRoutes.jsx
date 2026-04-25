@@ -7,6 +7,9 @@ import HomePage from '../pages/HomePage'
 import ChefDashboardPage from '../pages/ChefDashboardPage'
 import RiderDashboardPage from '../pages/RiderDashboardPage'
 import AdminDashboardPage from '../admin/pages/AdminDashboardPage'
+import ChefOrdersPage from '../chef/pages/ChefOrdersPage'
+import ChefOrderDetailPage from '../chef/pages/ChefOrderDetailPage'
+import ChefMenuPage from '../chef/pages/ChefMenuPage'
 import UsersPage from '../admin/pages/UsersPage'
 import RestaurantsPage from '../admin/pages/RestaurantsPage'
 import OrdersPage from '../admin/pages/OrdersPage'
@@ -32,6 +35,9 @@ export default function AppRoutes() {
 
       <Route element={<ProtectedRoute allowedRoles={[ROLES.chef]} />}>
         <Route path="/chef-dashboard" element={<ChefDashboardPage />} />
+        <Route path="/chef/orders" element={<ChefOrdersPage />} />
+        <Route path="/chef/orders/:id" element={<ChefOrderDetailPage />} />
+        <Route path="/chef/menu" element={<ChefMenuPage />} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={[ROLES.rider]} />}>

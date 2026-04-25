@@ -14,6 +14,7 @@ export class OrdersService {
     return this.prisma.order.create({
       data: {
         userId,
+        restaurantId: dto.restaurantId ?? null,
         status: OrderStatus.pending,
         subtotal,
         deliveryFee: dto.deliveryFee,

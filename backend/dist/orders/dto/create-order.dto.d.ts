@@ -4,6 +4,7 @@ declare class CreateOrderItemDto {
     unitPrice: number;
 }
 export declare class CreateOrderDto {
+    restaurantId?: string;
     items: CreateOrderItemDto[];
     deliveryFee: number;
 }
