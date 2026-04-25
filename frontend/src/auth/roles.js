@@ -1,7 +1,6 @@
 export const ROLES = /** @type {const} */ ({
   user: 'user',
   chef: 'chef',
-  rider: 'rider',
   admin: 'admin',
 })
 
@@ -13,8 +12,6 @@ export function roleHomePath(role) {
       return '/home'
     case ROLES.chef:
       return '/chef-dashboard'
-    case ROLES.rider:
-      return '/rider-dashboard'
     case ROLES.admin:
       return '/admin-dashboard'
     default:

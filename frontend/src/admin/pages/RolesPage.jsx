@@ -4,7 +4,7 @@ import '../../pages/ui.css'
 
 const STORAGE_KEY = 'americandemofood.admin.roles'
 
-const DEFAULT_PERMS = ['users', 'restaurants', 'orders', 'riders', 'roles', 'payments', 'reports']
+const DEFAULT_PERMS = ['users', 'restaurants', 'orders', 'roles', 'payments', 'reports']
 const DEFAULT_ACTIONS = ['create', 'read', 'update', 'delete']
 
 function loadRoles() {

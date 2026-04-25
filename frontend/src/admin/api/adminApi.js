@@ -41,9 +41,7 @@ export async function fetchAdminOrders() {
 }
 
 export async function fetchAdminRiders() {
-  // Recommended endpoint: GET /admin/riders
-  const res = await api.get('/admin/riders')
-  return res.data
+  throw new Error('Rider role removed from system')
 }
 
 export async function fetchAdminPayments() {
