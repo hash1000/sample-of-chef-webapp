@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const admin_module_1 = require("./admin/admin.module");
 const auth_module_1 = require("./auth/auth.module");
 const orders_module_1 = require("./orders/orders.module");
 const users_module_1 = require("./users/users.module");
@@ -24,6 +25,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             orders_module_1.OrdersModule,
+            admin_module_1.AdminModule,
         ],
     })
 ], AppModule);

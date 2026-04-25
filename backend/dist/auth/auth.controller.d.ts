@@ -8,9 +8,12 @@ export declare class AuthController {
         access_token: string;
         user: {
             name: string;
-            id: string;
             email: string;
+            id: string;
             role: import("@prisma/client").$Enums.Role;
+            isBlocked: boolean;
+            riderStatus: import("@prisma/client").$Enums.RiderStatus | null;
+            adminRoleId: string | null;
             createdAt: Date;
             updatedAt: Date;
         };
@@ -19,9 +22,12 @@ export declare class AuthController {
         access_token: string;
         user: {
             name: string;
-            id: string;
             email: string;
+            id: string;
             role: import("@prisma/client").$Enums.Role;
+            isBlocked: boolean;
+            riderStatus: import("@prisma/client").$Enums.RiderStatus | null;
+            adminRoleId: string | null;
             createdAt: Date;
             updatedAt: Date;
         };

@@ -6,7 +6,14 @@ import SignupPage from '../pages/SignupPage'
 import HomePage from '../pages/HomePage'
 import ChefDashboardPage from '../pages/ChefDashboardPage'
 import RiderDashboardPage from '../pages/RiderDashboardPage'
-import AdminDashboardPage from '../pages/AdminDashboardPage'
+import AdminDashboardPage from '../admin/pages/AdminDashboardPage'
+import UsersPage from '../admin/pages/UsersPage'
+import RestaurantsPage from '../admin/pages/RestaurantsPage'
+import OrdersPage from '../admin/pages/OrdersPage'
+import RidersPage from '../admin/pages/RidersPage'
+import RolesPage from '../admin/pages/RolesPage'
+import PaymentsPage from '../admin/pages/PaymentsPage'
+import ReportsPage from '../admin/pages/ReportsPage'
 import UnauthorizedPage from '../pages/UnauthorizedPage'
 
 export default function AppRoutes() {
@@ -33,6 +40,13 @@ export default function AppRoutes() {
 
       <Route element={<ProtectedRoute allowedRoles={[ROLES.admin]} />}>
         <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/restaurants" element={<RestaurantsPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/riders" element={<RidersPage />} />
+        <Route path="/roles" element={<RolesPage />} />
+        <Route path="/payments" element={<PaymentsPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />

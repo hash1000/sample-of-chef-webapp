@@ -23,6 +23,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('Invalid token');
     }
+    if ((user as any).isBlocked) {
+      throw new UnauthorizedException('User is blocked');
+    }
     return this.users.sanitize(user);
   }
 }

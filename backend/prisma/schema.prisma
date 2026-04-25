@@ -23,21 +23,58 @@ enum OrderStatus {
   delivered
 }
 
+enum RiderStatus {
+  online
+  offline
+}
+
+enum PaymentStatus {
+  requires_payment_method
+  requires_action
+  processing
+  succeeded
+  failed
+  canceled
+}
+
 model User {
   id           String   @id @default(uuid())
   name         String
   email        String   @unique
   passwordHash String
   role         Role     @default(user)
+  isBlocked    Boolean  @default(false)
+  riderStatus  RiderStatus?
+  adminRoleId  String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   orders       Order[]
+
+  adminRole    AdminRole? @relation(fields: [adminRoleId], references: [id])
+
+  chefRestaurants Restaurant[] @relation("ChefRestaurants")
+}
+
+model Restaurant {
+  id          String   @id @default(uuid())
+  name        String
+  rating      Float    @default(0)
+  isActive    Boolean  @default(true)
+  chefId      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  chef        User?    @relation("ChefRestaurants", fields: [chefId], references: [id])
+  orders      Order[]
+
+  @@index([chefId])
 }
 
 model Order {
   id          String      @id @default(uuid())
   userId      String
+  restaurantId String?
   status      OrderStatus @default(pending)
   subtotal    Int
   deliveryFee Int
@@ -46,9 +83,12 @@ model Order {
   updatedAt   DateTime    @updatedAt
 
   user        User        @relation(fields: [userId], references: [id])
+  restaurant  Restaurant? @relation(fields: [restaurantId], references: [id])
   items       OrderItem[]
+  payment     Payment?
 
   @@index([userId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
 }
 
 model OrderItem {
@@ -62,5 +102,55 @@ model OrderItem {
   order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  orderId         String        @unique
+  provider        String        @default("stripe")
+  stripeIntentId  String?       @unique
+  status          PaymentStatus @default(requires_payment_method)
+  amount          Int
+  currency        String        @default("usd")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt(sort: Desc)])
+}
+
+model AdminRole {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  key         String           @unique
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  id            String      @id @default(uuid())
+  roleId        String
+  permissionId  String
+  createdAt     DateTime    @default(now())
+
+  role          AdminRole   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
 }
 

@@ -9,38 +9,40 @@ export declare class OrdersService {
         items: {
             name: string;
             id: string;
+            orderId: string;
             quantity: number;
             unitPrice: number;
             lineTotal: number;
-            orderId: string;
         }[];
     } & {
+        status: import("@prisma/client").$Enums.OrderStatus;
+        userId: string;
+        total: number;
+        subtotal: number;
+        deliveryFee: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        deliveryFee: number;
-        userId: string;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        subtotal: number;
-        total: number;
+        restaurantId: string | null;
     })[]>;
     getForUser(userId: string, orderId: string): Promise<{
         items: {
             name: string;
             id: string;
+            orderId: string;
             quantity: number;
             unitPrice: number;
             lineTotal: number;
-            orderId: string;
         }[];
     } & {
+        status: import("@prisma/client").$Enums.OrderStatus;
+        userId: string;
+        total: number;
+        subtotal: number;
+        deliveryFee: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        deliveryFee: number;
-        userId: string;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        subtotal: number;
-        total: number;
+        restaurantId: string | null;
     }>;
 }
