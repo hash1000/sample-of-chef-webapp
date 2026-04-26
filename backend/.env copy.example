@@ -1,0 +1,9 @@
+DATABASE_URL="postgresql://hashirmehmood:1000@localhost:5432/americanfoodDB"
+JWT_SECRET="change-me"
+JWT_EXPIRES_IN="1d"
+PORT=4000
+
+# Host: localhost
+# Port: 5432
+# Username: hashirmehmood
+# Password: 1000   (or whatever you set)

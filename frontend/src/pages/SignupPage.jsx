@@ -74,6 +74,7 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isSubmitting}
+              className="!border-gray-500"
             />
           </div>
 
@@ -88,6 +89,7 @@ export default function SignupPage() {
               required
               disabled={isSubmitting}
               minLength={6}
+              className="!border-gray-500"
             />
           </div>
 
