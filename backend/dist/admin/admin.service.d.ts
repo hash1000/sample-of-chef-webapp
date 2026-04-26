@@ -122,6 +122,8 @@ export declare class AdminService {
             createdAt: Date;
             updatedAt: Date;
             restaurantId: string | null;
+            deliveryAddress: string | null;
+            paymentMethod: string;
         })[];
     }>;
     getOrder(id: string): Promise<{
@@ -163,6 +165,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
+        deliveryAddress: string | null;
+        paymentMethod: string;
     }>;
     createAdminRole(dto: CreateAdminRoleDto): Promise<{
         name: string;

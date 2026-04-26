@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ChefLayout from '../components/ChefLayout'
 import DataState from '../../admin/components/DataState'
-import { fetchChefOrders, toErrorMessage } from '../api/chefApi'
+import { fetchChefOrders, toErrorMessage, updateChefOrderStatus } from '../api/chefApi'
 import '../../pages/ui.css'
 
 const TABS = [
@@ -26,6 +26,20 @@ export default function ChefOrdersPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [rows, setRows] = useState([])
+  const [updatingId, setUpdatingId] = useState('')
+
+  async function refresh() {
+    setLoading(true)
+    setError('')
+    try {
+      const data = await fetchChefOrders()
+      setRows(Array.isArray(data) ? data : data?.items || [])
+    } catch (e) {
+      setError(toErrorMessage(e) || 'Unable to load chef orders.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     let alive = true
@@ -52,6 +66,19 @@ export default function ChefOrdersPage() {
     }
   }, [])
 
+  async function updateStatus(orderId, status) {
+    setUpdatingId(orderId)
+    setError('')
+    try {
+      const updated = await updateChefOrderStatus(orderId, status)
+      setRows((current) => current.map((order) => (order.id === orderId ? updated : order)))
+    } catch (e) {
+      setError(toErrorMessage(e))
+    } finally {
+      setUpdatingId('')
+    }
+  }
+
   const filtered = useMemo(() => {
     const def = TABS.find((t) => t.key === tab) || TABS[0]
     return rows.filter((o) => def.statuses.includes(String(o.status || '').toLowerCase()))
@@ -74,7 +101,7 @@ export default function ChefOrdersPage() {
           <span className="badge">{filtered.length} orders</span>
         </div>
         <div className="toolbarRight">
-          <button className="btnSecondary" type="button" onClick={() => window.location.reload()}>
+          <button className="btnSecondary" type="button" onClick={refresh}>
             Refresh
           </button>
         </div>
@@ -112,13 +139,28 @@ export default function ChefOrdersPage() {
                       <Link className="btnSecondary" to={`/chef/orders/${o.id}`}>
                         View
                       </Link>
-                      <button className="btnSecondary" type="button">
+                      <button
+                        className="btnSecondary"
+                        type="button"
+                        disabled={updatingId === o.id || o.status !== 'pending'}
+                        onClick={() => updateStatus(o.id, 'accepted')}
+                      >
                         Accept
                       </button>
-                      <button className="btnSecondary" type="button">
+                      <button
+                        className="btnSecondary"
+                        type="button"
+                        disabled={updatingId === o.id || o.status !== 'accepted'}
+                        onClick={() => updateStatus(o.id, 'preparing')}
+                      >
                         Preparing
                       </button>
-                      <button className="btnSecondary" type="button">
+                      <button
+                        className="btnSecondary"
+                        type="button"
+                        disabled={updatingId === o.id || o.status !== 'preparing'}
+                        onClick={() => updateStatus(o.id, 'ready')}
+                      >
                         Ready
                       </button>
                     </div>
@@ -128,10 +170,6 @@ export default function ChefOrdersPage() {
             </tbody>
           </table>
         </div>
-
-        <p className="muted" style={{ marginTop: 10, fontSize: 13 }}>
-          Wire these actions to backend endpoints like `PATCH /chef/orders/:id/status`.
-        </p>
       </DataState>
     </ChefLayout>
   )

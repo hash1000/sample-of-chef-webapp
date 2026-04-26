@@ -4,6 +4,10 @@ import { ROLES } from '../auth/roles'
 import LoginPage from '../pages/LoginPage'
 import SignupPage from '../pages/SignupPage'
 import HomePage from '../pages/HomePage'
+import RestaurantDetailPage from '../pages/RestaurantDetailPage'
+import CartPage from '../pages/CartPage'
+import CheckoutPage from '../pages/CheckoutPage'
+import OrderTrackingPage from '../pages/OrderTrackingPage'
 import ChefDashboardPage from '../pages/ChefDashboardPage'
 import AdminDashboardPage from '../admin/pages/AdminDashboardPage'
 import ChefOrdersPage from '../chef/pages/ChefOrdersPage'
@@ -29,6 +33,10 @@ export default function AppRoutes() {
 
       <Route element={<ProtectedRoute allowedRoles={[ROLES.user]} />}>
         <Route path="/home" element={<HomePage />} />
+        <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/orders/:id" element={<OrderTrackingPage />} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={[ROLES.chef]} />}>

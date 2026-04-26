@@ -1,4 +1,6 @@
 export default function FoodItemCard({ item, onAdd }) {
+  const price = Number(item.priceCents ?? 0) / 100
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
@@ -11,7 +13,7 @@ export default function FoodItemCard({ item, onAdd }) {
           ) : null}
         </div>
         <div className="text-sm font-semibold text-slate-900">
-          ${Number(item.price ?? 0).toFixed(2)}
+          ${price.toFixed(2)}
         </div>
       </div>
 
@@ -22,9 +24,10 @@ export default function FoodItemCard({ item, onAdd }) {
         <button
           type="button"
           onClick={() => onAdd(item)}
+          disabled={!item.isAvailable}
           className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
         >
-          Add to cart
+          {item.isAvailable ? 'Add to cart' : 'Unavailable'}
         </button>
       </div>
     </div>

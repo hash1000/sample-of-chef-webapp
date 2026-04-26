@@ -34,7 +34,7 @@ __decorate([
     __metadata("design:type", String)
 ], SignupDto.prototype, "password", void 0);
 __decorate([
-    (0, class_validator_1.IsEnum)(client_1.Role),
+    (0, class_validator_1.IsIn)([client_1.Role.user, client_1.Role.chef]),
     __metadata("design:type", String)
 ], SignupDto.prototype, "role", void 0);
 //# sourceMappingURL=signup.dto.js.map

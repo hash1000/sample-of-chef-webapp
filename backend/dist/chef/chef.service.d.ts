@@ -35,6 +35,8 @@ export declare class ChefService {
             createdAt: Date;
             updatedAt: Date;
             restaurantId: string | null;
+            deliveryAddress: string | null;
+            paymentMethod: string;
         })[];
     }>;
     getOrder(chefId: string, orderId: string): Promise<{
@@ -72,6 +74,8 @@ export declare class ChefService {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
+        deliveryAddress: string | null;
+        paymentMethod: string;
     }>;
     updateOrderStatus(chefId: string, orderId: string, dto: UpdateChefOrderStatusDto): Promise<({
         user: {
@@ -108,6 +112,8 @@ export declare class ChefService {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
+        deliveryAddress: string | null;
+        paymentMethod: string;
     }) | null>;
     listMenu(chefId: string): Promise<{
         name: string;

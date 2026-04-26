@@ -33,6 +33,8 @@ export declare class ChefController {
             createdAt: Date;
             updatedAt: Date;
             restaurantId: string | null;
+            deliveryAddress: string | null;
+            paymentMethod: string;
         })[];
     }>;
     getOrder(req: any, id: string): Promise<{
@@ -70,6 +72,8 @@ export declare class ChefController {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
+        deliveryAddress: string | null;
+        paymentMethod: string;
     }>;
     updateStatus(req: any, id: string, dto: UpdateChefOrderStatusDto): Promise<({
         user: {
@@ -106,6 +110,8 @@ export declare class ChefController {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
+        deliveryAddress: string | null;
+        paymentMethod: string;
     }) | null>;
     listMenu(req: any): Promise<{
         name: string;

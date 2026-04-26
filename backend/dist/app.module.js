@@ -13,6 +13,7 @@ const admin_module_1 = require("./admin/admin.module");
 const auth_module_1 = require("./auth/auth.module");
 const chef_module_1 = require("./chef/chef.module");
 const orders_module_1 = require("./orders/orders.module");
+const restaurants_module_1 = require("./restaurants/restaurants.module");
 const users_module_1 = require("./users/users.module");
 let AppModule = class AppModule {
 };
@@ -25,6 +26,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
+            restaurants_module_1.RestaurantsModule,
             orders_module_1.OrdersModule,
             admin_module_1.AdminModule,
             chef_module_1.ChefModule,

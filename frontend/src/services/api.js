@@ -38,6 +38,7 @@ export function getApiErrorMessage(error) {
 
   if (typeof data === 'string') return data
   if (typeof data?.message === 'string') return data.message
+  if (Array.isArray(data?.message) && data.message.length) return data.message[0]
   if (Array.isArray(data?.errors) && data.errors.length) {
     const first = data.errors[0]
     return typeof first === 'string' ? first : first?.message || 'Request failed'

@@ -13,29 +13,24 @@ exports.CreateOrderDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 class CreateOrderItemDto {
-    name;
+    menuItemId;
     quantity;
-    unitPrice;
 }
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateOrderItemDto.prototype, "name", void 0);
+], CreateOrderItemDto.prototype, "menuItemId", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateOrderItemDto.prototype, "quantity", void 0);
-__decorate([
-    (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.Min)(0),
-    __metadata("design:type", Number)
-], CreateOrderItemDto.prototype, "unitPrice", void 0);
 class CreateOrderDto {
     restaurantId;
+    deliveryAddress;
+    paymentMethod;
     items;
-    deliveryFee;
 }
 exports.CreateOrderDto = CreateOrderDto;
 __decorate([
@@ -45,15 +40,20 @@ __decorate([
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "restaurantId", void 0);
 __decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "deliveryAddress", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "paymentMethod", void 0);
+__decorate([
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ArrayMinSize)(1),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => CreateOrderItemDto),
     __metadata("design:type", Array)
 ], CreateOrderDto.prototype, "items", void 0);
-__decorate([
-    (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.Min)(0),
-    __metadata("design:type", Number)
-], CreateOrderDto.prototype, "deliveryFee", void 0);
 //# sourceMappingURL=create-order.dto.js.map

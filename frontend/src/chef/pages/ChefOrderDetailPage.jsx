@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ChefLayout from '../components/ChefLayout'
 import DataState from '../../admin/components/DataState'
-import { fetchChefOrder, toErrorMessage } from '../api/chefApi'
+import { fetchChefOrder, toErrorMessage, updateChefOrderStatus } from '../api/chefApi'
 import '../../pages/ui.css'
 
 function money(cents) {
@@ -15,6 +15,7 @@ export default function ChefOrderDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [order, setOrder] = useState(null)
+  const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -42,6 +43,19 @@ export default function ChefOrderDetailPage() {
   }, [id])
 
   const items = useMemo(() => order?.items || [], [order])
+
+  async function updateStatus(status) {
+    setUpdating(true)
+    setError('')
+    try {
+      const updated = await updateChefOrderStatus(id, status)
+      setOrder(updated)
+    } catch (e) {
+      setError(toErrorMessage(e))
+    } finally {
+      setUpdating(false)
+    }
+  }
 
   return (
     <ChefLayout
@@ -73,16 +87,31 @@ export default function ChefOrderDetailPage() {
           <div className="statCard">
             <strong>Actions</strong>
             <p className="muted" style={{ marginTop: 8, fontSize: 13 }}>
-              Hook these to `PATCH /chef/orders/:id/status`.
+              Marking ready automatically delivers the order.
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
-              <button className="btnSecondary" type="button">
+              <button
+                className="btnSecondary"
+                type="button"
+                disabled={updating || order?.status !== 'pending'}
+                onClick={() => updateStatus('accepted')}
+              >
                 Accept
               </button>
-              <button className="btnSecondary" type="button">
+              <button
+                className="btnSecondary"
+                type="button"
+                disabled={updating || order?.status !== 'accepted'}
+                onClick={() => updateStatus('preparing')}
+              >
                 Preparing
               </button>
-              <button className="btnSecondary" type="button">
+              <button
+                className="btnSecondary"
+                type="button"
+                disabled={updating || order?.status !== 'preparing'}
+                onClick={() => updateStatus('ready')}
+              >
                 Ready for pickup
               </button>
             </div>

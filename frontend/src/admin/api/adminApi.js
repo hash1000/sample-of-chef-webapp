@@ -1,24 +1,14 @@
 import { api, getApiErrorMessage } from '../../services/api'
 
 export async function fetchAdminSummary() {
-  // If you later add a real endpoint (recommended): GET /admin/summary
-  // For now, try best-effort calls and derive summary from what exists.
-  const [orders] = await Promise.all([
-    api.get('/orders/user').catch(() => ({ data: [] })), // placeholder until real admin orders exists
+  const [dashboard, orders] = await Promise.all([
+    api.get('/admin/dashboard'),
+    api.get('/admin/orders', { params: { limit: 8 } }),
   ])
 
-  const totalOrders = Array.isArray(orders.data) ? orders.data.length : 0
-  const totalRevenueCents = (Array.isArray(orders.data) ? orders.data : []).reduce(
-    (sum, o) => sum + (o?.total ?? 0),
-    0,
-  )
-
   return {
-    totalUsers: '—',
-    totalRestaurants: '—',
-    totalOrders,
-    totalRevenue: `$${(totalRevenueCents / 100).toFixed(2)}`,
-    recentOrders: (Array.isArray(orders.data) ? orders.data : []).slice(0, 8),
+    ...dashboard.data,
+    recentOrders: orders.data?.items ?? [],
   }
 }
 

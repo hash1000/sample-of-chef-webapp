@@ -103,7 +103,6 @@ export default function SignupPage() {
             >
               <option value={ROLES.user}>user</option>
               <option value={ROLES.chef}>chef</option>
-              <option value={ROLES.admin}>admin</option>
             </select>
           </div>
 

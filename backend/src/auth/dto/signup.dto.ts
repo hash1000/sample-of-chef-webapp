@@ -1,5 +1,5 @@
 import { Role } from '@prisma/client';
-import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class SignupDto {
   @IsString()
@@ -13,7 +13,7 @@ export class SignupDto {
   @MinLength(8)
   password!: string;
 
-  @IsEnum(Role)
-  role!: Role;
+  @IsIn([Role.user, Role.chef])
+  role!: 'user' | 'chef';
 }
 

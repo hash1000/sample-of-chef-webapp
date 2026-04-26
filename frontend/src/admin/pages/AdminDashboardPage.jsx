@@ -48,7 +48,7 @@ export default function AdminDashboardPage() {
             <StatCard label="Total Users" value={data?.totalUsers ?? '—'} />
             <StatCard label="Total Restaurants" value={data?.totalRestaurants ?? '—'} />
             <StatCard label="Total Orders" value={String(data?.totalOrders ?? 0)} />
-            <StatCard label="Total Revenue" value={data?.totalRevenue ?? '—'} />
+            <StatCard label="Total Revenue" value={formatCents(data?.totalRevenue)} />
           </div>
 
           <div>
@@ -92,8 +92,7 @@ export default function AdminDashboardPage() {
             </div>
 
             <p className="muted" style={{ marginTop: 10, fontSize: 13 }}>
-              Note: once you add real admin endpoints (e.g. `/admin/summary`, `/admin/orders`),
-              this page will automatically become fully data-driven.
+              Revenue is calculated from order totals and updates as new demo orders are placed.
             </p>
           </div>
         </div>

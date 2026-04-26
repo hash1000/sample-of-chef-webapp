@@ -6,6 +6,26 @@ export declare class OrdersService {
     constructor(prisma: PrismaService);
     createForUser(userId: string, dto: CreateOrderDto): Promise<Order>;
     listForUser(userId: string): Promise<({
+        restaurant: {
+            name: string;
+            chefId: string | null;
+            isActive: boolean;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            rating: number;
+        } | null;
+        payment: {
+            status: import("@prisma/client").$Enums.PaymentStatus;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            orderId: string;
+            provider: string;
+            stripeIntentId: string | null;
+            amount: number;
+            currency: string;
+        } | null;
         items: {
             name: string;
             id: string;
@@ -24,8 +44,30 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
+        deliveryAddress: string | null;
+        paymentMethod: string;
     })[]>;
     getForUser(userId: string, orderId: string): Promise<{
+        restaurant: {
+            name: string;
+            chefId: string | null;
+            isActive: boolean;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            rating: number;
+        } | null;
+        payment: {
+            status: import("@prisma/client").$Enums.PaymentStatus;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            orderId: string;
+            provider: string;
+            stripeIntentId: string | null;
+            amount: number;
+            currency: string;
+        } | null;
         items: {
             name: string;
             id: string;
@@ -44,5 +86,7 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         restaurantId: string | null;
+        deliveryAddress: string | null;
+        paymentMethod: string;
     }>;
 }

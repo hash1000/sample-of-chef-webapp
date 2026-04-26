@@ -1,4 +1,6 @@
 export default function CartItem({ item, onDec, onInc, onRemove }) {
+  const price = Number(item.priceCents ?? 0) / 100
+
   return (
     <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="min-w-0">
@@ -6,7 +8,7 @@ export default function CartItem({ item, onDec, onInc, onRemove }) {
           {item.name}
         </div>
         <div className="mt-1 text-xs text-slate-500">
-          ${Number(item.price).toFixed(2)} each
+          ${price.toFixed(2)} each
         </div>
       </div>
 

@@ -86,6 +86,8 @@ model Order {
   userId      String
   restaurantId String?
   status      OrderStatus @default(pending)
+  deliveryAddress String?
+  paymentMethod String      @default("mock")
   subtotal    Int
   deliveryFee Int
   total       Int

@@ -13,16 +13,11 @@ import { Type } from 'class-transformer';
 class CreateOrderItemDto {
   @IsString()
   @IsNotEmpty()
-  name!: string;
+  menuItemId!: string;
 
   @IsInt()
   @Min(1)
   quantity!: number;
-
-  // cents
-  @IsInt()
-  @Min(0)
-  unitPrice!: number;
 }
 
 export class CreateOrderDto {
@@ -31,15 +26,18 @@ export class CreateOrderDto {
   @IsNotEmpty()
   restaurantId?: string;
 
+  @IsString()
+  @IsNotEmpty()
+  deliveryAddress!: string;
+
+  @IsOptional()
+  @IsString()
+  paymentMethod?: 'mock' | 'stripe';
+
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
   items!: CreateOrderItemDto[];
-
-  // cents
-  @IsInt()
-  @Min(0)
-  deliveryFee!: number;
 }
 

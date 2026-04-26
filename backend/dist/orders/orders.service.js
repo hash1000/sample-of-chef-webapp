@@ -19,38 +19,71 @@ let OrdersService = class OrdersService {
         this.prisma = prisma;
     }
     async createForUser(userId, dto) {
-        const subtotal = dto.items.reduce((sum, it) => sum + it.unitPrice * it.quantity, 0);
-        const total = subtotal + dto.deliveryFee;
+        const menuItemIds = dto.items.map((item) => item.menuItemId);
+        const menuItems = await this.prisma.menuItem.findMany({
+            where: { id: { in: menuItemIds }, isAvailable: true, restaurant: { isActive: true } },
+            include: { restaurant: true },
+        });
+        const menuById = new Map(menuItems.map((item) => [item.id, item]));
+        if (menuItems.length !== new Set(menuItemIds).size) {
+            throw new common_1.BadRequestException('One or more menu items are unavailable');
+        }
+        const restaurantId = dto.restaurantId ?? menuItems[0]?.restaurantId;
+        if (!restaurantId || menuItems.some((item) => item.restaurantId !== restaurantId)) {
+            throw new common_1.BadRequestException('All items must belong to the same restaurant');
+        }
+        const subtotal = dto.items.reduce((sum, it) => {
+            const menuItem = menuById.get(it.menuItemId);
+            if (!menuItem)
+                throw new common_1.BadRequestException('Invalid menu item');
+            return sum + menuItem.priceCents * it.quantity;
+        }, 0);
+        const deliveryFee = subtotal >= 5000 ? 0 : 499;
+        const total = subtotal + deliveryFee;
         return this.prisma.order.create({
             data: {
                 userId,
-                restaurantId: dto.restaurantId ?? null,
+                restaurantId,
                 status: client_1.OrderStatus.pending,
+                deliveryAddress: dto.deliveryAddress.trim(),
+                paymentMethod: dto.paymentMethod ?? 'mock',
                 subtotal,
-                deliveryFee: dto.deliveryFee,
+                deliveryFee,
                 total,
                 items: {
-                    create: dto.items.map((it) => ({
-                        name: it.name,
-                        quantity: it.quantity,
-                        unitPrice: it.unitPrice,
-                        lineTotal: it.unitPrice * it.quantity,
-                    })),
+                    create: dto.items.map((it) => {
+                        const menuItem = menuById.get(it.menuItemId);
+                        return {
+                            name: menuItem.name,
+                            quantity: it.quantity,
+                            unitPrice: menuItem.priceCents,
+                            lineTotal: menuItem.priceCents * it.quantity,
+                        };
+                    }),
+                },
+                payment: {
+                    create: {
+                        provider: dto.paymentMethod === 'stripe' ? 'stripe' : 'mock',
+                        status: client_1.PaymentStatus.succeeded,
+                        amount: total,
+                        currency: 'usd',
+                    },
                 },
             },
+            include: { items: true, payment: true, restaurant: true },
         });
     }
     async listForUser(userId) {
         return this.prisma.order.findMany({
             where: { userId },
             orderBy: { createdAt: 'desc' },
-            include: { items: true },
+            include: { items: true, restaurant: true, payment: true },
         });
     }
     async getForUser(userId, orderId) {
         const order = await this.prisma.order.findUnique({
             where: { id: orderId },
-            include: { items: true },
+            include: { items: true, restaurant: true, payment: true },
         });
         if (!order)
             throw new common_1.NotFoundException('Order not found');

@@ -1,11 +1,11 @@
 declare class CreateOrderItemDto {
-    name: string;
+    menuItemId: string;
     quantity: number;
-    unitPrice: number;
 }
 export declare class CreateOrderDto {
     restaurantId?: string;
+    deliveryAddress: string;
+    paymentMethod?: 'mock' | 'stripe';
     items: CreateOrderItemDto[];
-    deliveryFee: number;
 }
 export {};

@@ -4,6 +4,7 @@ import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { ChefModule } from './chef/chef.module';
 import { OrdersModule } from './orders/orders.module';
+import { RestaurantsModule } from './restaurants/restaurants.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -13,6 +14,7 @@ import { UsersModule } from './users/users.module';
     }),
     UsersModule,
     AuthModule,
+    RestaurantsModule,
     OrdersModule,
     AdminModule,
     ChefModule,

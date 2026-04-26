@@ -12,7 +12,7 @@ export default function RestaurantCard({ restaurant }) {
             {restaurant.name}
           </div>
           <div className="mt-1 text-sm text-slate-500">
-            {restaurant.cuisine || 'Various cuisines'}
+            {restaurant.menuItems?.[0]?.category || 'American favorites'}
           </div>
         </div>
         <div className="rounded-xl bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
@@ -21,7 +21,7 @@ export default function RestaurantCard({ restaurant }) {
       </div>
 
       <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
-        <span>{restaurant.deliveryTimeMins ?? 30} mins</span>
+        <span>{restaurant.menuItems?.length ?? 0} featured items</span>
         <span className="text-slate-900 group-hover:underline">View menu</span>
       </div>
     </Link>
