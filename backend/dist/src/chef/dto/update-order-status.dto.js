@@ -17,7 +17,7 @@ class UpdateChefOrderStatusDto {
 exports.UpdateChefOrderStatusDto = UpdateChefOrderStatusDto;
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsIn)(['accepted', 'preparing', 'ready']),
+    (0, class_validator_1.IsIn)(['accepted', 'preparing', 'dispatched', 'completed', 'ready']),
     __metadata("design:type", String)
 ], UpdateChefOrderStatusDto.prototype, "status", void 0);
 //# sourceMappingURL=update-order-status.dto.js.map

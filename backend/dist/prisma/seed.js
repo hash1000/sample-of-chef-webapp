@@ -38,27 +38,43 @@ const bcrypt = __importStar(require("bcrypt"));
 const prisma = new client_1.PrismaClient();
 const ADMIN_EMAIL = 'admin@chef.test';
 const ADMIN_PASSWORD = 'Admin@12345';
-const CHEF_EMAIL = 'chef@chef.test';
 const USER_EMAIL = 'user@chef.test';
 const DEFAULT_PASSWORD = 'Password@12345';
+async function upsertUser(data) {
+    return prisma.user.upsert({
+        where: { email: data.email },
+        update: {
+            name: data.name,
+            passwordHash: data.passwordHash,
+            role: data.role,
+            isBlocked: data.isBlocked ?? false,
+            adminRoleId: data.adminRoleId,
+        },
+        create: data,
+    });
+}
 async function upsertRestaurant(data) {
     const existing = await prisma.restaurant.findFirst({ where: { name: data.name } });
+    const restaurantData = {
+        city: data.city,
+        rating: data.rating,
+        status: data.status,
+        menuType: data.menuType,
+        description: data.description,
+        isActive: data.isActive ??
+            (data.status !== client_1.RestaurantStatus.blocked && data.status !== client_1.RestaurantStatus.rejected),
+        chefId: data.chefId,
+    };
     if (existing) {
         return prisma.restaurant.update({
             where: { id: existing.id },
-            data: {
-                rating: data.rating,
-                isActive: data.isActive ?? true,
-                chefId: data.chefId,
-            },
+            data: restaurantData,
         });
     }
     return prisma.restaurant.create({
         data: {
             name: data.name,
-            rating: data.rating,
-            isActive: data.isActive ?? true,
-            chefId: data.chefId,
+            ...restaurantData,
         },
     });
 }
@@ -85,7 +101,7 @@ async function main() {
     const permissions = await Promise.all([
         ['dashboard.read', 'View admin dashboard metrics'],
         ['users.manage', 'Block, unblock, and review users'],
-        ['restaurants.manage', 'Create and update restaurants'],
+        ['restaurants.manage', 'Approve, block, and update restaurants'],
         ['orders.manage', 'Review and update all orders'],
         ['payments.read', 'Review payment records'],
         ['roles.manage', 'Manage admin roles and permissions'],
@@ -106,78 +122,115 @@ async function main() {
         })),
         skipDuplicates: true,
     });
-    const admin = await prisma.user.upsert({
-        where: { email: ADMIN_EMAIL },
-        update: {
-            name: 'Test Admin',
-            passwordHash: adminPasswordHash,
-            role: client_1.Role.admin,
-            isBlocked: false,
-            adminRoleId: superAdminRole.id,
-        },
-        create: {
-            name: 'Test Admin',
-            email: ADMIN_EMAIL,
-            passwordHash: adminPasswordHash,
-            role: client_1.Role.admin,
-            adminRoleId: superAdminRole.id,
-        },
+    const admin = await upsertUser({
+        name: 'Test Admin',
+        email: ADMIN_EMAIL,
+        passwordHash: adminPasswordHash,
+        role: client_1.Role.admin,
+        adminRoleId: superAdminRole.id,
     });
-    const chef = await prisma.user.upsert({
-        where: { email: CHEF_EMAIL },
-        update: {
-            name: 'Sample Chef',
-            passwordHash,
-            role: client_1.Role.chef,
-            isBlocked: false,
-        },
-        create: {
-            name: 'Sample Chef',
-            email: CHEF_EMAIL,
-            passwordHash,
-            role: client_1.Role.chef,
-        },
+    const customer = await upsertUser({
+        name: 'Sample Customer',
+        email: USER_EMAIL,
+        passwordHash,
+        role: client_1.Role.user,
     });
-    const customer = await prisma.user.upsert({
-        where: { email: USER_EMAIL },
-        update: {
-            name: 'Sample Customer',
-            passwordHash,
-            role: client_1.Role.user,
-            isBlocked: false,
-        },
-        create: {
-            name: 'Sample Customer',
-            email: USER_EMAIL,
-            passwordHash,
-            role: client_1.Role.user,
-        },
+    const blockedCustomer = await upsertUser({
+        name: 'Blocked Customer',
+        email: 'blocked@chef.test',
+        passwordHash,
+        role: client_1.Role.user,
+        isBlocked: true,
     });
-    const blockedCustomer = await prisma.user.upsert({
-        where: { email: 'blocked@chef.test' },
-        update: {
-            name: 'Blocked Customer',
-            passwordHash,
-            role: client_1.Role.user,
-            isBlocked: true,
-        },
-        create: {
-            name: 'Blocked Customer',
-            email: 'blocked@chef.test',
-            passwordHash,
-            role: client_1.Role.user,
-            isBlocked: true,
-        },
+    const lahoreChef = await upsertUser({
+        name: 'Lahore Chef',
+        email: 'lahore.chef@chef.test',
+        passwordHash,
+        role: client_1.Role.chef,
+    });
+    const karachiChef = await upsertUser({
+        name: 'Karachi Chef',
+        email: 'karachi.chef@chef.test',
+        passwordHash,
+        role: client_1.Role.chef,
+    });
+    const islamabadChef = await upsertUser({
+        name: 'Islamabad Chef',
+        email: 'islamabad.chef@chef.test',
+        passwordHash,
+        role: client_1.Role.chef,
+    });
+    const pendingChef = await upsertUser({
+        name: 'Pending Chef',
+        email: 'pending.chef@chef.test',
+        passwordHash,
+        role: client_1.Role.chef,
+    });
+    const rejectedChef = await upsertUser({
+        name: 'Rejected Chef',
+        email: 'rejected.chef@chef.test',
+        passwordHash,
+        role: client_1.Role.chef,
+    });
+    const blockedChef = await upsertUser({
+        name: 'Blocked Chef',
+        email: 'blocked.chef@chef.test',
+        passwordHash,
+        role: client_1.Role.chef,
     });
     const spiceKitchen = await upsertRestaurant({
-        name: 'Spice Kitchen',
+        name: 'Spice Kitchen Lahore',
+        city: client_1.City.lahore,
         rating: 4.8,
-        chefId: chef.id,
+        status: client_1.RestaurantStatus.approved,
+        menuType: 'Pakistani',
+        description: 'Lahore-style biryani, karahi, and tandoor favorites.',
+        chefId: lahoreChef.id,
     });
-    const greenBowl = await upsertRestaurant({
-        name: 'Green Bowl',
-        rating: 4.5,
-        chefId: chef.id,
+    const seaSalt = await upsertRestaurant({
+        name: 'Sea Salt Karachi',
+        city: client_1.City.karachi,
+        rating: 4.7,
+        status: client_1.RestaurantStatus.approved,
+        menuType: 'Seafood',
+        description: 'Karachi seafood plates, rolls, and coastal grills.',
+        chefId: karachiChef.id,
+    });
+    const capitalGrill = await upsertRestaurant({
+        name: 'Capital Grill Islamabad',
+        city: client_1.City.islamabad,
+        rating: 4.6,
+        status: client_1.RestaurantStatus.approved,
+        menuType: 'Grill',
+        description: 'Grilled mains, salads, and family platters in Islamabad.',
+        chefId: islamabadChef.id,
+    });
+    await upsertRestaurant({
+        name: 'Pending Tandoor Request',
+        city: client_1.City.lahore,
+        rating: 0,
+        status: client_1.RestaurantStatus.pending,
+        menuType: 'Tandoor',
+        description: 'Admin approval test restaurant.',
+        chefId: pendingChef.id,
+    });
+    await upsertRestaurant({
+        name: 'Rejected Roll House',
+        city: client_1.City.karachi,
+        rating: 2.4,
+        status: client_1.RestaurantStatus.rejected,
+        menuType: 'Fast Food',
+        description: 'Rejected registration sample for admin testing.',
+        chefId: rejectedChef.id,
+    });
+    await upsertRestaurant({
+        name: 'Blocked BBQ Spot',
+        city: client_1.City.islamabad,
+        rating: 3.1,
+        status: client_1.RestaurantStatus.blocked,
+        menuType: 'BBQ',
+        description: 'Blocked restaurant sample for admin testing.',
+        chefId: blockedChef.id,
     });
     const biryani = await upsertMenuItem({
         restaurantId: spiceKitchen.id,
@@ -200,33 +253,51 @@ async function main() {
         category: 'Bread',
         description: 'Tandoor baked naan brushed with garlic butter.',
     });
-    const salad = await upsertMenuItem({
-        restaurantId: greenBowl.id,
+    const fish = await upsertMenuItem({
+        restaurantId: seaSalt.id,
+        name: 'Masala Fish',
+        priceCents: 1699,
+        category: 'Seafood',
+        description: 'Crisp fried fish with house masala and chutney.',
+    });
+    await upsertMenuItem({
+        restaurantId: seaSalt.id,
+        name: 'Zinger Roll',
+        priceCents: 899,
+        category: 'Wraps',
+        description: 'Spicy crispy chicken roll with garlic mayo.',
+    });
+    const platter = await upsertMenuItem({
+        restaurantId: capitalGrill.id,
+        name: 'Mixed Grill Platter',
+        priceCents: 2499,
+        category: 'Grill',
+        description: 'Chicken tikka, kebab, grilled vegetables, and rice.',
+    });
+    await upsertMenuItem({
+        restaurantId: capitalGrill.id,
         name: 'Harvest Salad',
         priceCents: 1099,
         category: 'Salad',
         description: 'Greens, grilled vegetables, chickpeas, and house dressing.',
     });
-    await upsertMenuItem({
-        restaurantId: greenBowl.id,
-        name: 'Lentil Soup',
-        priceCents: 799,
-        category: 'Soup',
-        description: 'Slow cooked lentils with herbs and lemon.',
-    });
     await prisma.order.deleteMany({
         where: { userId: { in: [customer.id, blockedCustomer.id] } },
     });
+    const lahoreTotal = biryani.priceCents * 2 + karahi.priceCents + 499;
     await prisma.order.create({
         data: {
             userId: customer.id,
             restaurantId: spiceKitchen.id,
             status: client_1.OrderStatus.accepted,
+            customerName: customer.name,
+            customerEmail: customer.email,
+            customerPhone: '03001234567',
             deliveryAddress: 'House 12, Test Street, Lahore',
             paymentMethod: 'mock',
             subtotal: biryani.priceCents * 2 + karahi.priceCents,
             deliveryFee: 499,
-            total: biryani.priceCents * 2 + karahi.priceCents + 499,
+            total: lahoreTotal,
             items: {
                 create: [
                     {
@@ -247,29 +318,33 @@ async function main() {
                 create: {
                     provider: 'mock',
                     status: client_1.PaymentStatus.succeeded,
-                    amount: biryani.priceCents * 2 + karahi.priceCents + 499,
+                    amount: lahoreTotal,
                     currency: 'usd',
                 },
             },
         },
     });
+    const karachiTotal = fish.priceCents * 2 + 499;
     await prisma.order.create({
         data: {
             userId: customer.id,
-            restaurantId: greenBowl.id,
-            status: client_1.OrderStatus.delivered,
+            restaurantId: seaSalt.id,
+            status: client_1.OrderStatus.ready,
+            customerName: customer.name,
+            customerEmail: customer.email,
+            customerPhone: '03001234567',
             deliveryAddress: 'Apartment 8, Sample Avenue, Karachi',
             paymentMethod: 'stripe',
-            subtotal: salad.priceCents * 3,
+            subtotal: fish.priceCents * 2,
             deliveryFee: 499,
-            total: salad.priceCents * 3 + 499,
+            total: karachiTotal,
             items: {
                 create: [
                     {
-                        name: salad.name,
-                        quantity: 3,
-                        unitPrice: salad.priceCents,
-                        lineTotal: salad.priceCents * 3,
+                        name: fish.name,
+                        quantity: 2,
+                        unitPrice: fish.priceCents,
+                        lineTotal: fish.priceCents * 2,
                     },
                 ],
             },
@@ -278,7 +353,41 @@ async function main() {
                     provider: 'stripe',
                     stripeIntentId: 'pi_seed_sample_001',
                     status: client_1.PaymentStatus.succeeded,
-                    amount: salad.priceCents * 3 + 499,
+                    amount: karachiTotal,
+                    currency: 'usd',
+                },
+            },
+        },
+    });
+    const islamabadTotal = platter.priceCents + 499;
+    await prisma.order.create({
+        data: {
+            userId: customer.id,
+            restaurantId: capitalGrill.id,
+            status: client_1.OrderStatus.delivered,
+            customerName: customer.name,
+            customerEmail: customer.email,
+            customerPhone: '03001234567',
+            deliveryAddress: 'Street 22, F-7, Islamabad',
+            paymentMethod: 'mock',
+            subtotal: platter.priceCents,
+            deliveryFee: 499,
+            total: islamabadTotal,
+            items: {
+                create: [
+                    {
+                        name: platter.name,
+                        quantity: 1,
+                        unitPrice: platter.priceCents,
+                        lineTotal: platter.priceCents,
+                    },
+                ],
+            },
+            payment: {
+                create: {
+                    provider: 'mock',
+                    status: client_1.PaymentStatus.succeeded,
+                    amount: islamabadTotal,
                     currency: 'usd',
                 },
             },
@@ -286,8 +395,9 @@ async function main() {
     });
     console.log('Seed complete');
     console.log(`Admin login: ${admin.email} / ${ADMIN_PASSWORD}`);
-    console.log(`Chef login: ${chef.email} / ${DEFAULT_PASSWORD}`);
     console.log(`User login: ${customer.email} / ${DEFAULT_PASSWORD}`);
+    console.log(`Approved chef logins: lahore.chef@chef.test, karachi.chef@chef.test, islamabad.chef@chef.test / ${DEFAULT_PASSWORD}`);
+    console.log(`Pending chef login: pending.chef@chef.test / ${DEFAULT_PASSWORD}`);
 }
 main()
     .catch((error) => {

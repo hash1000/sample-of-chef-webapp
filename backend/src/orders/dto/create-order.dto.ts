@@ -1,6 +1,7 @@
 import {
   ArrayMinSize,
   IsArray,
+  IsEmail,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -22,6 +23,17 @@ class CreateOrderItemDto {
 
 export class CreateOrderDto {
   @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  customerName!: string;
+
+  @IsEmail()
+  customerEmail!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  customerPhone!: string;
+
   @IsString()
   @IsNotEmpty()
   restaurantId?: string;

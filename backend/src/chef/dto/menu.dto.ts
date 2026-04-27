@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateMenuItemDto {
@@ -6,6 +7,7 @@ export class CreateMenuItemDto {
   name!: string;
 
   @IsInt()
+  @Type(() => Number)
   @Min(0)
   priceCents!: number;
 
@@ -26,6 +28,7 @@ export class UpdateMenuItemDto {
 
   @IsOptional()
   @IsInt()
+  @Type(() => Number)
   @Min(0)
   priceCents?: number;
 

@@ -10,11 +10,14 @@ import { OrdersService } from './orders.service';
 export class OrdersController {
   constructor(private readonly orders: OrdersService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.user)
   @Post()
-  async create(@Req() req: any, @Body() dto: CreateOrderDto) {
-    return this.orders.createForUser(req.user.id, dto);
+  async create(@Body() dto: CreateOrderDto) {
+    return this.orders.createGuest(dto);
+  }
+
+  @Post(':id/confirm-payment')
+  async confirmPayment(@Param('id') id: string, @Body() dto: { sessionId: string }) {
+    return this.orders.confirmStripePayment(id, dto.sessionId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -24,11 +27,9 @@ export class OrdersController {
     return this.orders.listForUser(req.user.id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.user)
   @Get(':id')
-  async getMine(@Req() req: any, @Param('id') id: string) {
-    return this.orders.getForUser(req.user.id, id);
+  async get(@Param('id') id: string) {
+    return this.orders.getPublic(id);
   }
 }
 

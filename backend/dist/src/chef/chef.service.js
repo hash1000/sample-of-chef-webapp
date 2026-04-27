@@ -24,22 +24,47 @@ let ChefService = class ChefService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async getChefRestaurantOrThrow(chefId) {
+    async getChefRestaurantOrThrow(chefId, requireApproved = true) {
         const restaurant = await this.prisma.restaurant.findFirst({
             where: { chefId },
+            orderBy: { createdAt: 'desc' },
         });
         if (!restaurant)
             throw new common_1.ForbiddenException('Chef has no assigned restaurant');
+        if (requireApproved &&
+            (restaurant.status !== client_1.RestaurantStatus.approved || !restaurant.isActive)) {
+            throw new common_1.ForbiddenException(`Restaurant is ${restaurant.status} and cannot access this feature`);
+        }
         return restaurant;
+    }
+    async getRestaurant(chefId) {
+        return this.getChefRestaurantOrThrow(chefId, false);
+    }
+    async updateRestaurant(chefId, dto) {
+        const restaurant = await this.getChefRestaurantOrThrow(chefId, false);
+        if (restaurant.status === client_1.RestaurantStatus.blocked) {
+            throw new common_1.ForbiddenException('Blocked restaurant cannot be updated');
+        }
+        return this.prisma.restaurant.update({
+            where: { id: restaurant.id },
+            data: {
+                name: dto.name?.trim(),
+                city: dto.city,
+                menuType: dto.menuType?.trim(),
+                description: dto.description?.trim(),
+            },
+        });
     }
     async listOrders(chefId, query) {
         const restaurant = await this.getChefRestaurantOrThrow(chefId);
         const { page, limit, skip } = pageParams(query);
         const statusWhere = query.status === 'completed'
             ? { in: [client_1.OrderStatus.delivered] }
-            : query.status
-                ? { equals: query.status }
-                : undefined;
+            : query.status === 'dispatched'
+                ? { in: [client_1.OrderStatus.ready] }
+                : query.status
+                    ? { equals: query.status }
+                    : undefined;
         const where = {
             restaurantId: restaurant.id,
             ...(statusWhere ? { status: statusWhere } : {}),
@@ -78,7 +103,9 @@ let ChefService = class ChefService {
             ? { from: client_1.OrderStatus.pending, to: client_1.OrderStatus.accepted }
             : desired === 'preparing'
                 ? { from: client_1.OrderStatus.accepted, to: client_1.OrderStatus.preparing }
-                : { from: client_1.OrderStatus.preparing, to: client_1.OrderStatus.delivered };
+                : desired === 'completed'
+                    ? { from: client_1.OrderStatus.ready, to: client_1.OrderStatus.delivered }
+                    : { from: client_1.OrderStatus.preparing, to: client_1.OrderStatus.ready };
         const updated = await this.prisma.order.updateMany({
             where: {
                 id: orderId,

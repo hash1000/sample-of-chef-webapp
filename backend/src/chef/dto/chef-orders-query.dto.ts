@@ -4,8 +4,8 @@ import { Type } from 'class-transformer';
 export class ChefOrdersQueryDto {
   @IsOptional()
   @IsString()
-  @IsIn(['pending', 'accepted', 'preparing', 'completed'])
-  status?: 'pending' | 'accepted' | 'preparing' | 'completed';
+  @IsIn(['pending', 'accepted', 'preparing', 'dispatched', 'completed', 'ready', 'delivered'])
+  status?: 'pending' | 'accepted' | 'preparing' | 'dispatched' | 'completed' | 'ready' | 'delivered';
 
   @IsOptional()
   @Type(() => Number)

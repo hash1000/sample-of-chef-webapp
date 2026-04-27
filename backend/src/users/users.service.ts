@@ -31,15 +31,6 @@ export class UsersService {
         email: params.email,
         passwordHash: params.passwordHash,
         role: params.role,
-        ...(params.role === Role.chef
-          ? {
-              chefRestaurants: {
-                create: {
-                  name: `${params.name}'s Kitchen`,
-                },
-              },
-            }
-          : {}),
       },
     });
   }

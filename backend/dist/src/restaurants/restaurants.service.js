@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestaurantsService = void 0;
 const common_1 = require("@nestjs/common");
+const client_1 = require("@prisma/client");
 const prisma_service_1 = require("../prisma/prisma.service");
 function pageParams(query) {
     const page = Math.max(1, query.page ?? 1);
@@ -28,6 +29,8 @@ let RestaurantsService = class RestaurantsService {
         const category = query.category?.trim();
         const where = {
             isActive: true,
+            status: client_1.RestaurantStatus.approved,
+            ...(query.city ? { city: query.city } : {}),
             ...(q
                 ? {
                     OR: [
@@ -68,7 +71,7 @@ let RestaurantsService = class RestaurantsService {
     }
     async get(id) {
         const restaurant = await this.prisma.restaurant.findFirst({
-            where: { id, isActive: true },
+            where: { id, isActive: true, status: client_1.RestaurantStatus.approved },
             include: {
                 chef: { select: { id: true, name: true } },
                 menuItems: { orderBy: [{ category: 'asc' }, { name: 'asc' }] },

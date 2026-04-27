@@ -20,12 +20,19 @@ const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../common/guards/roles.guard");
 const chef_orders_query_dto_1 = require("./dto/chef-orders-query.dto");
 const menu_dto_1 = require("./dto/menu.dto");
+const restaurant_dto_1 = require("./dto/restaurant.dto");
 const update_order_status_dto_1 = require("./dto/update-order-status.dto");
 const chef_service_1 = require("./chef.service");
 let ChefController = class ChefController {
     chef;
     constructor(chef) {
         this.chef = chef;
+    }
+    getRestaurant(req) {
+        return this.chef.getRestaurant(req.user.id);
+    }
+    updateRestaurant(req, dto) {
+        return this.chef.updateRestaurant(req.user.id, dto);
     }
     listOrders(req, query) {
         return this.chef.listOrders(req.user.id, query);
@@ -53,6 +60,21 @@ let ChefController = class ChefController {
     }
 };
 exports.ChefController = ChefController;
+__decorate([
+    (0, common_1.Get)('restaurant'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ChefController.prototype, "getRestaurant", null);
+__decorate([
+    (0, common_1.Patch)('restaurant'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, restaurant_dto_1.UpdateChefRestaurantDto]),
+    __metadata("design:returntype", void 0)
+], ChefController.prototype, "updateRestaurant", null);
 __decorate([
     (0, common_1.Get)('orders'),
     __param(0, (0, common_1.Req)()),

@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { RestaurantStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { RestaurantsQueryDto } from './dto/restaurants-query.dto';
 
@@ -19,6 +20,8 @@ export class RestaurantsService {
 
     const where = {
       isActive: true,
+      status: RestaurantStatus.approved,
+      ...(query.city ? { city: query.city } : {}),
       ...(q
         ? {
             OR: [
@@ -62,7 +65,7 @@ export class RestaurantsService {
 
   async get(id: string) {
     const restaurant = await this.prisma.restaurant.findFirst({
-      where: { id, isActive: true },
+      where: { id, isActive: true, status: RestaurantStatus.approved },
       include: {
         chef: { select: { id: true, name: true } },
         menuItems: { orderBy: [{ category: 'asc' }, { name: 'asc' }] },

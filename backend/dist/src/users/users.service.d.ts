@@ -13,12 +13,12 @@ export declare class UsersService {
     }): Promise<User>;
     sanitize(user: User): {
         id: string;
-        name: string;
-        createdAt: Date;
-        updatedAt: Date;
         email: string;
+        name: string;
         role: import("@prisma/client").$Enums.Role;
         isBlocked: boolean;
         adminRoleId: string | null;
+        createdAt: Date;
+        updatedAt: Date;
     };
 }

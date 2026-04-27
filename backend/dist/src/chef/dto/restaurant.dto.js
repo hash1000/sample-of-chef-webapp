@@ -9,34 +9,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChefOrdersQueryDto = void 0;
+exports.UpdateChefRestaurantDto = void 0;
+const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
-const class_transformer_1 = require("class-transformer");
-class ChefOrdersQueryDto {
-    status;
-    page;
-    limit;
+class UpdateChefRestaurantDto {
+    name;
+    city;
+    menuType;
+    description;
 }
-exports.ChefOrdersQueryDto = ChefOrdersQueryDto;
+exports.UpdateChefRestaurantDto = UpdateChefRestaurantDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsIn)(['pending', 'accepted', 'preparing', 'dispatched', 'completed', 'ready', 'delivered']),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], ChefOrdersQueryDto.prototype, "status", void 0);
+], UpdateChefRestaurantDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_transformer_1.Type)(() => Number),
-    (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.Min)(1),
-    __metadata("design:type", Number)
-], ChefOrdersQueryDto.prototype, "page", void 0);
+    (0, class_validator_1.IsIn)([client_1.City.islamabad, client_1.City.karachi, client_1.City.lahore]),
+    __metadata("design:type", String)
+], UpdateChefRestaurantDto.prototype, "city", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_transformer_1.Type)(() => Number),
-    (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.Min)(1),
-    (0, class_validator_1.Max)(100),
-    __metadata("design:type", Number)
-], ChefOrdersQueryDto.prototype, "limit", void 0);
-//# sourceMappingURL=chef-orders-query.dto.js.map
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], UpdateChefRestaurantDto.prototype, "menuType", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateChefRestaurantDto.prototype, "description", void 0);
+//# sourceMappingURL=restaurant.dto.js.map

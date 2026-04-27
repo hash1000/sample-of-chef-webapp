@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { ChefOrdersQueryDto } from './dto/chef-orders-query.dto';
 import { CreateMenuItemDto, ToggleAvailabilityDto, UpdateMenuItemDto } from './dto/menu.dto';
+import { UpdateChefRestaurantDto } from './dto/restaurant.dto';
 import { UpdateChefOrderStatusDto } from './dto/update-order-status.dto';
 import { ChefService } from './chef.service';
 
@@ -13,6 +14,16 @@ import { ChefService } from './chef.service';
 @Controller('chef')
 export class ChefController {
   constructor(private readonly chef: ChefService) {}
+
+  @Get('restaurant')
+  getRestaurant(@Req() req: any) {
+    return this.chef.getRestaurant(req.user.id);
+  }
+
+  @Patch('restaurant')
+  updateRestaurant(@Req() req: any, @Body() dto: UpdateChefRestaurantDto) {
+    return this.chef.updateRestaurant(req.user.id, dto);
+  }
 
   @Get('orders')
   listOrders(@Req() req: any, @Query() query: ChefOrdersQueryDto) {

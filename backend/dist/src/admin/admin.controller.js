@@ -52,6 +52,18 @@ let AdminController = class AdminController {
     updateRestaurant(id, dto) {
         return this.admin.updateRestaurant(id, dto);
     }
+    approveRestaurant(id) {
+        return this.admin.setRestaurantStatus(id, client_1.RestaurantStatus.approved);
+    }
+    rejectRestaurant(id) {
+        return this.admin.setRestaurantStatus(id, client_1.RestaurantStatus.rejected);
+    }
+    blockRestaurant(id) {
+        return this.admin.setRestaurantStatus(id, client_1.RestaurantStatus.blocked);
+    }
+    unblockRestaurant(id) {
+        return this.admin.setRestaurantStatus(id, client_1.RestaurantStatus.approved);
+    }
     deleteRestaurant(id) {
         return this.admin.deleteRestaurant(id);
     }
@@ -137,6 +149,34 @@ __decorate([
     __metadata("design:paramtypes", [String, restaurants_dto_1.UpdateRestaurantDto]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "updateRestaurant", null);
+__decorate([
+    (0, common_1.Patch)('restaurants/:id/approve'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "approveRestaurant", null);
+__decorate([
+    (0, common_1.Patch)('restaurants/:id/reject'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "rejectRestaurant", null);
+__decorate([
+    (0, common_1.Patch)('restaurants/:id/block'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "blockRestaurant", null);
+__decorate([
+    (0, common_1.Patch)('restaurants/:id/unblock'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "unblockRestaurant", null);
 __decorate([
     (0, common_1.Delete)('restaurants/:id'),
     __param(0, (0, common_1.Param)('id')),

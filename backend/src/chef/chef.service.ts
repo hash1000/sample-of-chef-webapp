@@ -1,8 +1,9 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { MenuItem, OrderStatus } from '@prisma/client';
+import { MenuItem, OrderStatus, RestaurantStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChefOrdersQueryDto } from './dto/chef-orders-query.dto';
 import { CreateMenuItemDto, ToggleAvailabilityDto, UpdateMenuItemDto } from './dto/menu.dto';
+import { UpdateChefRestaurantDto } from './dto/restaurant.dto';
 import { UpdateChefOrderStatusDto } from './dto/update-order-status.dto';
 
 function pageParams(q: { page?: number; limit?: number }) {
@@ -16,12 +17,40 @@ function pageParams(q: { page?: number; limit?: number }) {
 export class ChefService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async getChefRestaurantOrThrow(chefId: string) {
+  private async getChefRestaurantOrThrow(chefId: string, requireApproved = true) {
     const restaurant = await this.prisma.restaurant.findFirst({
       where: { chefId },
+      orderBy: { createdAt: 'desc' },
     });
     if (!restaurant) throw new ForbiddenException('Chef has no assigned restaurant');
+    if (
+      requireApproved &&
+      (restaurant.status !== RestaurantStatus.approved || !restaurant.isActive)
+    ) {
+      throw new ForbiddenException(`Restaurant is ${restaurant.status} and cannot access this feature`);
+    }
     return restaurant;
+  }
+
+  async getRestaurant(chefId: string) {
+    return this.getChefRestaurantOrThrow(chefId, false);
+  }
+
+  async updateRestaurant(chefId: string, dto: UpdateChefRestaurantDto) {
+    const restaurant = await this.getChefRestaurantOrThrow(chefId, false);
+    if (restaurant.status === RestaurantStatus.blocked) {
+      throw new ForbiddenException('Blocked restaurant cannot be updated');
+    }
+
+    return this.prisma.restaurant.update({
+      where: { id: restaurant.id },
+      data: {
+        name: dto.name?.trim(),
+        city: dto.city,
+        menuType: dto.menuType?.trim(),
+        description: dto.description?.trim(),
+      },
+    });
   }
 
   async listOrders(chefId: string, query: ChefOrdersQueryDto) {
@@ -31,6 +60,8 @@ export class ChefService {
     const statusWhere =
       query.status === 'completed'
         ? { in: [OrderStatus.delivered] }
+        : query.status === 'dispatched'
+          ? { in: [OrderStatus.ready] }
         : query.status
           ? { equals: query.status as any }
           : undefined;
@@ -72,14 +103,15 @@ export class ChefService {
     const restaurant = await this.getChefRestaurantOrThrow(chefId);
     const desired = dto.status;
 
-    // Core rule (NO rider): when chef marks "ready", system finalizes as "delivered".
     // We enforce atomic transitions by updating with an expected current status.
     const transition =
       desired === 'accepted'
         ? { from: OrderStatus.pending, to: OrderStatus.accepted }
         : desired === 'preparing'
           ? { from: OrderStatus.accepted, to: OrderStatus.preparing }
-          : { from: OrderStatus.preparing, to: OrderStatus.delivered }; // desired === 'ready'
+          : desired === 'completed'
+            ? { from: OrderStatus.ready, to: OrderStatus.delivered }
+            : { from: OrderStatus.preparing, to: OrderStatus.ready };
 
     const updated = await this.prisma.order.updateMany({
       where: {

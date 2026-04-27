@@ -11,10 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestaurantsQueryDto = void 0;
 const class_transformer_1 = require("class-transformer");
+const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
 class RestaurantsQueryDto {
     q;
     category;
+    city;
     page = 1;
     limit = 20;
 }
@@ -29,6 +31,11 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RestaurantsQueryDto.prototype, "category", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsIn)([client_1.City.islamabad, client_1.City.karachi, client_1.City.lahore]),
+    __metadata("design:type", String)
+], RestaurantsQueryDto.prototype, "city", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Transform)(({ value }) => Number(value)),

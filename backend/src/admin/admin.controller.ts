@@ -9,7 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { RestaurantStatus, Role } from '@prisma/client';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -68,6 +68,26 @@ export class AdminController {
   @Patch('restaurants/:id')
   updateRestaurant(@Param('id') id: string, @Body() dto: UpdateRestaurantDto) {
     return this.admin.updateRestaurant(id, dto);
+  }
+
+  @Patch('restaurants/:id/approve')
+  approveRestaurant(@Param('id') id: string) {
+    return this.admin.setRestaurantStatus(id, RestaurantStatus.approved);
+  }
+
+  @Patch('restaurants/:id/reject')
+  rejectRestaurant(@Param('id') id: string) {
+    return this.admin.setRestaurantStatus(id, RestaurantStatus.rejected);
+  }
+
+  @Patch('restaurants/:id/block')
+  blockRestaurant(@Param('id') id: string) {
+    return this.admin.setRestaurantStatus(id, RestaurantStatus.blocked);
+  }
+
+  @Patch('restaurants/:id/unblock')
+  unblockRestaurant(@Param('id') id: string) {
+    return this.admin.setRestaurantStatus(id, RestaurantStatus.approved);
   }
 
   @Delete('restaurants/:id')

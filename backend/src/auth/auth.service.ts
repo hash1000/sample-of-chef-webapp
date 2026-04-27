@@ -1,10 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Role } from '@prisma/client';
+import { RestaurantStatus, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
+import { RegisterRestaurantDto } from './dto/register-restaurant.dto';
 import { SignupDto } from './dto/signup.dto';
 import { JwtPayload } from './types/jwt-payload';
 
@@ -14,6 +16,7 @@ export class AuthService {
     private readonly users: UsersService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly prisma: PrismaService,
   ) {}
 
   private saltRounds(): number {
@@ -29,6 +32,37 @@ export class AuthService {
       email: dto.email.toLowerCase(),
       passwordHash,
       role: dto.role ?? Role.user,
+    });
+
+    const access_token = await this.signToken(user.id, user.role);
+    return { access_token, user: this.users.sanitize(user) };
+  }
+
+  async registerRestaurant(dto: RegisterRestaurantDto) {
+    const email = dto.email.toLowerCase();
+    const existing = await this.users.findByEmail(email);
+    if (existing) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, this.saltRounds());
+    const user = await this.prisma.user.create({
+      data: {
+        name: dto.name.trim(),
+        email,
+        passwordHash,
+        role: Role.chef,
+        chefRestaurants: {
+          create: {
+            name: dto.restaurantName.trim(),
+            city: dto.city,
+            menuType: dto.menuType.trim(),
+            description: dto.description?.trim(),
+            status: RestaurantStatus.pending,
+            isActive: true,
+          },
+        },
+      },
     });
 
     const access_token = await this.signToken(user.id, user.role);

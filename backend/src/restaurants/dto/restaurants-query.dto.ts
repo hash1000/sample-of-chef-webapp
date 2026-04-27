@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { City } from '@prisma/client';
+import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class RestaurantsQueryDto {
   @IsOptional()
@@ -9,6 +10,10 @@ export class RestaurantsQueryDto {
   @IsOptional()
   @IsString()
   category?: string;
+
+  @IsOptional()
+  @IsIn([City.islamabad, City.karachi, City.lahore])
+  city?: City;
 
   @IsOptional()
   @Transform(({ value }) => Number(value))

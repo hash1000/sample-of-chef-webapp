@@ -30,6 +30,19 @@ enum PaymentStatus {
   canceled
 }
 
+enum City {
+  islamabad
+  karachi
+  lahore
+}
+
+enum RestaurantStatus {
+  pending
+  approved
+  rejected
+  blocked
+}
+
 model User {
   id           String   @id @default(uuid())
   name         String
@@ -49,19 +62,24 @@ model User {
 }
 
 model Restaurant {
-  id          String   @id @default(uuid())
+  id          String           @id @default(uuid())
   name        String
-  rating      Float    @default(0)
-  isActive    Boolean  @default(true)
+  rating      Float            @default(0)
+  city        City             @default(lahore)
+  status      RestaurantStatus @default(pending)
+  description String?
+  menuType    String?
+  isActive    Boolean          @default(true)
   chefId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
-  chef        User?    @relation("ChefRestaurants", fields: [chefId], references: [id])
+  chef        User?     @relation("ChefRestaurants", fields: [chefId], references: [id])
   menuItems   MenuItem[]
   orders      Order[]
 
   @@index([chefId])
+  @@index([city, status, isActive])
 }
 
 model MenuItem {
@@ -83,9 +101,12 @@ model MenuItem {
 
 model Order {
   id          String      @id @default(uuid())
-  userId      String
+  userId      String?
   restaurantId String?
   status      OrderStatus @default(pending)
+  customerName String
+  customerEmail String
+  customerPhone String
   deliveryAddress String?
   paymentMethod String      @default("mock")
   subtotal    Int
@@ -94,7 +115,7 @@ model Order {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  user        User        @relation(fields: [userId], references: [id])
+  user        User?       @relation(fields: [userId], references: [id])
   restaurant  Restaurant? @relation(fields: [restaurantId], references: [id])
   items       OrderItem[]
   payment     Payment?

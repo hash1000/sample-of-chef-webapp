@@ -48,15 +48,18 @@ const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 const client_1 = require("@prisma/client");
 const bcrypt = __importStar(require("bcrypt"));
+const prisma_service_1 = require("../prisma/prisma.service");
 const users_service_1 = require("../users/users.service");
 let AuthService = class AuthService {
     users;
     jwt;
     config;
-    constructor(users, jwt, config) {
+    prisma;
+    constructor(users, jwt, config, prisma) {
         this.users = users;
         this.jwt = jwt;
         this.config = config;
+        this.prisma = prisma;
     }
     saltRounds() {
         const rounds = Number(this.config.get('BCRYPT_SALT_ROUNDS') ?? 10);
@@ -69,6 +72,34 @@ let AuthService = class AuthService {
             email: dto.email.toLowerCase(),
             passwordHash,
             role: dto.role ?? client_1.Role.user,
+        });
+        const access_token = await this.signToken(user.id, user.role);
+        return { access_token, user: this.users.sanitize(user) };
+    }
+    async registerRestaurant(dto) {
+        const email = dto.email.toLowerCase();
+        const existing = await this.users.findByEmail(email);
+        if (existing) {
+            throw new common_1.ConflictException('Email already exists');
+        }
+        const passwordHash = await bcrypt.hash(dto.password, this.saltRounds());
+        const user = await this.prisma.user.create({
+            data: {
+                name: dto.name.trim(),
+                email,
+                passwordHash,
+                role: client_1.Role.chef,
+                chefRestaurants: {
+                    create: {
+                        name: dto.restaurantName.trim(),
+                        city: dto.city,
+                        menuType: dto.menuType.trim(),
+                        description: dto.description?.trim(),
+                        status: client_1.RestaurantStatus.pending,
+                        isActive: true,
+                    },
+                },
+            },
         });
         const access_token = await this.signToken(user.id, user.role);
         return { access_token, user: this.users.sanitize(user) };
@@ -95,6 +126,7 @@ exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
         jwt_1.JwtService,
-        config_1.ConfigService])
+        config_1.ConfigService,
+        prisma_service_1.PrismaService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

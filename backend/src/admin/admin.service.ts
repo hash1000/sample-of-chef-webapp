@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { OrderStatus, Role } from '@prisma/client';
+import { OrderStatus, RestaurantStatus, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminOrdersFilterDto } from './dto/orders-filter.dto';
 import { PaginationDto } from './dto/pagination.dto';
@@ -23,9 +23,20 @@ export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
   async dashboard() {
-    const [totalUsers, totalRestaurants, totalOrders, revenueAgg] = await Promise.all([
+    const [
+      totalUsers,
+      totalRestaurants,
+      activeApprovedRestaurants,
+      pendingRestaurants,
+      totalOrders,
+      revenueAgg,
+    ] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.restaurant.count(),
+      this.prisma.restaurant.count({
+        where: { status: RestaurantStatus.approved, isActive: true },
+      }),
+      this.prisma.restaurant.count({ where: { status: RestaurantStatus.pending } }),
       this.prisma.order.count(),
       this.prisma.order.aggregate({ _sum: { total: true } }),
     ]);
@@ -33,6 +44,8 @@ export class AdminService {
     return {
       totalUsers,
       totalRestaurants,
+      activeApprovedRestaurants,
+      pendingRestaurants,
       totalOrders,
       totalRevenue: revenueAgg._sum.total ?? 0,
     };
@@ -97,7 +110,16 @@ export class AdminService {
     }
 
     return this.prisma.restaurant.create({
-      data: { name: dto.name, chefId: dto.chefId ?? null },
+      data: {
+        name: dto.name.trim(),
+        city: dto.city,
+        status: dto.status ?? RestaurantStatus.approved,
+        description: dto.description?.trim(),
+        menuType: dto.menuType?.trim(),
+        rating: dto.rating ?? 0,
+        isActive: dto.status === RestaurantStatus.blocked ? false : true,
+        chefId: dto.chefId ?? null,
+      },
     });
   }
 
@@ -137,10 +159,33 @@ export class AdminService {
     return this.prisma.restaurant.update({
       where: { id },
       data: {
-        name: dto.name,
+        name: dto.name?.trim(),
+        city: dto.city,
+        status: dto.status,
+        description: dto.description === null ? null : dto.description?.trim(),
+        menuType: dto.menuType === null ? null : dto.menuType?.trim(),
+        rating: dto.rating,
         isActive: dto.isActive,
         chefId: dto.chefId === '' ? null : dto.chefId,
       },
+      include: { chef: { select: { id: true, email: true, name: true } } },
+    });
+  }
+
+  async setRestaurantStatus(id: string, status: RestaurantStatus) {
+    const existing = await this.prisma.restaurant.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Restaurant not found');
+
+    const isActive =
+      status === RestaurantStatus.approved
+        ? true
+        : status === RestaurantStatus.blocked || status === RestaurantStatus.rejected
+          ? false
+          : existing.isActive;
+
+    return this.prisma.restaurant.update({
+      where: { id },
+      data: { status, isActive },
       include: { chef: { select: { id: true, email: true, name: true } } },
     });
   }
