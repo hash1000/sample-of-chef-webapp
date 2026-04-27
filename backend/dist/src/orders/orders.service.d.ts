@@ -7,29 +7,103 @@ export declare class OrdersService {
     private readonly config;
     constructor(prisma: PrismaService, config: ConfigService);
     createForUser(userId: string, dto: CreateOrderDto): Promise<Order>;
-    createGuest(dto: CreateOrderDto): Promise<{
+    createGuest(dto: CreateOrderDto): Promise<({
+        restaurant: {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            rating: number;
+            city: import("@prisma/client").$Enums.City;
+            status: import("@prisma/client").$Enums.RestaurantStatus;
+            description: string | null;
+            menuType: string | null;
+            isActive: boolean;
+            chefId: string | null;
+        } | null;
+        items: {
+            id: string;
+            name: string;
+            quantity: number;
+            unitPrice: number;
+            lineTotal: number;
+            orderId: string;
+        }[];
+        payment: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("@prisma/client").$Enums.PaymentStatus;
+            provider: string;
+            stripeIntentId: string | null;
+            amount: number;
+            currency: string;
+            orderId: string;
+        } | null;
+    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         restaurantId: string | null;
+        customerName: string;
+        customerEmail: string;
+        customerPhone: string;
+        deliveryAddress: string | null;
+        paymentMethod: string;
         subtotal: number;
         deliveryFee: number;
         total: number;
-        userId: string;
-    } | {
-        payment: any;
+        userId: string | null;
+    }) | {
+        payment: {
+            stripeIntentId: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("@prisma/client").$Enums.PaymentStatus;
+            provider: string;
+            amount: number;
+            currency: string;
+            orderId: string;
+        } | null;
         checkoutUrl: string;
         checkoutSessionId: string;
+        restaurant: {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            rating: number;
+            city: import("@prisma/client").$Enums.City;
+            status: import("@prisma/client").$Enums.RestaurantStatus;
+            description: string | null;
+            menuType: string | null;
+            isActive: boolean;
+            chefId: string | null;
+        } | null;
+        items: {
+            id: string;
+            name: string;
+            quantity: number;
+            unitPrice: number;
+            lineTotal: number;
+            orderId: string;
+        }[];
         id: string;
         createdAt: Date;
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         restaurantId: string | null;
+        customerName: string;
+        customerEmail: string;
+        customerPhone: string;
+        deliveryAddress: string | null;
+        paymentMethod: string;
         subtotal: number;
         deliveryFee: number;
         total: number;
-        userId: string;
+        userId: string | null;
     }>;
     private createOrder;
     listForUser(userId: string): Promise<({
@@ -39,6 +113,10 @@ export declare class OrdersService {
             createdAt: Date;
             updatedAt: Date;
             rating: number;
+            city: import("@prisma/client").$Enums.City;
+            status: import("@prisma/client").$Enums.RestaurantStatus;
+            description: string | null;
+            menuType: string | null;
             isActive: boolean;
             chefId: string | null;
         } | null;
@@ -67,10 +145,15 @@ export declare class OrdersService {
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         restaurantId: string | null;
+        customerName: string;
+        customerEmail: string;
+        customerPhone: string;
+        deliveryAddress: string | null;
+        paymentMethod: string;
         subtotal: number;
         deliveryFee: number;
         total: number;
-        userId: string;
+        userId: string | null;
     })[]>;
     getForUser(userId: string, orderId: string): Promise<{
         restaurant: {
@@ -79,6 +162,10 @@ export declare class OrdersService {
             createdAt: Date;
             updatedAt: Date;
             rating: number;
+            city: import("@prisma/client").$Enums.City;
+            status: import("@prisma/client").$Enums.RestaurantStatus;
+            description: string | null;
+            menuType: string | null;
             isActive: boolean;
             chefId: string | null;
         } | null;
@@ -107,10 +194,15 @@ export declare class OrdersService {
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         restaurantId: string | null;
+        customerName: string;
+        customerEmail: string;
+        customerPhone: string;
+        deliveryAddress: string | null;
+        paymentMethod: string;
         subtotal: number;
         deliveryFee: number;
         total: number;
-        userId: string;
+        userId: string | null;
     }>;
     getPublic(orderId: string): Promise<{
         restaurant: {
@@ -119,6 +211,10 @@ export declare class OrdersService {
             createdAt: Date;
             updatedAt: Date;
             rating: number;
+            city: import("@prisma/client").$Enums.City;
+            status: import("@prisma/client").$Enums.RestaurantStatus;
+            description: string | null;
+            menuType: string | null;
             isActive: boolean;
             chefId: string | null;
         } | null;
@@ -147,10 +243,15 @@ export declare class OrdersService {
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         restaurantId: string | null;
+        customerName: string;
+        customerEmail: string;
+        customerPhone: string;
+        deliveryAddress: string | null;
+        paymentMethod: string;
         subtotal: number;
         deliveryFee: number;
         total: number;
-        userId: string;
+        userId: string | null;
     }>;
     confirmStripePayment(orderId: string, sessionId: string): Promise<{
         restaurant: {
@@ -159,6 +260,10 @@ export declare class OrdersService {
             createdAt: Date;
             updatedAt: Date;
             rating: number;
+            city: import("@prisma/client").$Enums.City;
+            status: import("@prisma/client").$Enums.RestaurantStatus;
+            description: string | null;
+            menuType: string | null;
             isActive: boolean;
             chefId: string | null;
         } | null;
@@ -187,10 +292,15 @@ export declare class OrdersService {
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         restaurantId: string | null;
+        customerName: string;
+        customerEmail: string;
+        customerPhone: string;
+        deliveryAddress: string | null;
+        paymentMethod: string;
         subtotal: number;
         deliveryFee: number;
         total: number;
-        userId: string;
+        userId: string | null;
     }>;
     private stripeSecretKey;
     private frontendUrl;

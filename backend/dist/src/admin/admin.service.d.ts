@@ -41,6 +41,10 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         rating: number;
+        city: import("@prisma/client").$Enums.City;
+        status: import("@prisma/client").$Enums.RestaurantStatus;
+        description: string | null;
+        menuType: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
@@ -60,25 +64,49 @@ export declare class AdminService {
             createdAt: Date;
             updatedAt: Date;
             rating: number;
+            city: import("@prisma/client").$Enums.City;
+            status: import("@prisma/client").$Enums.RestaurantStatus;
+            description: string | null;
+            menuType: string | null;
             isActive: boolean;
             chefId: string | null;
         })[];
     }>;
     updateRestaurant(id: string, dto: UpdateRestaurantDto): Promise<{
+        chef: {
+            id: string;
+            email: string;
+            name: string;
+        } | null;
+    } & {
         id: string;
         name: string;
         createdAt: Date;
         updatedAt: Date;
         rating: number;
+        city: import("@prisma/client").$Enums.City;
+        status: import("@prisma/client").$Enums.RestaurantStatus;
+        description: string | null;
+        menuType: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
     setRestaurantStatus(id: string, status: RestaurantStatus): Promise<{
+        chef: {
+            id: string;
+            email: string;
+            name: string;
+        } | null;
+    } & {
         id: string;
         name: string;
         createdAt: Date;
         updatedAt: Date;
         rating: number;
+        city: import("@prisma/client").$Enums.City;
+        status: import("@prisma/client").$Enums.RestaurantStatus;
+        description: string | null;
+        menuType: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
@@ -94,7 +122,7 @@ export declare class AdminService {
                 id: string;
                 email: string;
                 name: string;
-            };
+            } | null;
             restaurant: {
                 id: string;
                 name: string;
@@ -124,10 +152,15 @@ export declare class AdminService {
             updatedAt: Date;
             status: import("@prisma/client").$Enums.OrderStatus;
             restaurantId: string | null;
+            customerName: string;
+            customerEmail: string;
+            customerPhone: string;
+            deliveryAddress: string | null;
+            paymentMethod: string;
             subtotal: number;
             deliveryFee: number;
             total: number;
-            userId: string;
+            userId: string | null;
         })[];
     }>;
     getOrder(id: string): Promise<{
@@ -135,7 +168,7 @@ export declare class AdminService {
             id: string;
             email: string;
             name: string;
-        };
+        } | null;
         restaurant: {
             id: string;
             name: string;
@@ -165,10 +198,15 @@ export declare class AdminService {
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         restaurantId: string | null;
+        customerName: string;
+        customerEmail: string;
+        customerPhone: string;
+        deliveryAddress: string | null;
+        paymentMethod: string;
         subtotal: number;
         deliveryFee: number;
         total: number;
-        userId: string;
+        userId: string | null;
     }>;
     createAdminRole(dto: CreateAdminRoleDto): Promise<{
         id: string;

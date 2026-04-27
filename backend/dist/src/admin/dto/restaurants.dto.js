@@ -8,7 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateRestaurantDto = exports.CreateRestaurantDto = void 0;
 const client_1 = require("@prisma/client");
@@ -30,7 +29,7 @@ __decorate([
 ], CreateRestaurantDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsIn)([client_1.City.islamabad, client_1.City.karachi, client_1.City.lahore]),
-    __metadata("design:type", typeof (_a = typeof client_1.City !== "undefined" && client_1.City) === "function" ? _a : Object)
+    __metadata("design:type", String)
 ], CreateRestaurantDto.prototype, "city", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
@@ -62,7 +61,7 @@ __decorate([
         client_1.RestaurantStatus.rejected,
         client_1.RestaurantStatus.blocked,
     ]),
-    __metadata("design:type", typeof (_b = typeof client_1.RestaurantStatus !== "undefined" && client_1.RestaurantStatus) === "function" ? _b : Object)
+    __metadata("design:type", String)
 ], CreateRestaurantDto.prototype, "status", void 0);
 class UpdateRestaurantDto {
     name;
@@ -89,7 +88,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsIn)([client_1.City.islamabad, client_1.City.karachi, client_1.City.lahore]),
-    __metadata("design:type", typeof (_c = typeof client_1.City !== "undefined" && client_1.City) === "function" ? _c : Object)
+    __metadata("design:type", String)
 ], UpdateRestaurantDto.prototype, "city", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
@@ -116,7 +115,7 @@ __decorate([
         client_1.RestaurantStatus.rejected,
         client_1.RestaurantStatus.blocked,
     ]),
-    __metadata("design:type", typeof (_d = typeof client_1.RestaurantStatus !== "undefined" && client_1.RestaurantStatus) === "function" ? _d : Object)
+    __metadata("design:type", String)
 ], UpdateRestaurantDto.prototype, "status", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
