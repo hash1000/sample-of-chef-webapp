@@ -3,6 +3,7 @@ import ProtectedRoute from './ProtectedRoute'
 import { ROLES } from '../auth/roles'
 import LoginPage from '../pages/LoginPage'
 import SignupPage from '../pages/SignupPage'
+import RegisterRestaurantPage from '../pages/RegisterRestaurantPage'
 import HomePage from '../pages/HomePage'
 import RestaurantDetailPage from '../pages/RestaurantDetailPage'
 import CartPage from '../pages/CartPage'
@@ -10,6 +11,7 @@ import CheckoutPage from '../pages/CheckoutPage'
 import OrderTrackingPage from '../pages/OrderTrackingPage'
 import ChefDashboardPage from '../pages/ChefDashboardPage'
 import AdminDashboardPage from '../admin/pages/AdminDashboardPage'
+import ChefRestaurantPage from '../chef/pages/ChefRestaurantPage'
 import ChefOrdersPage from '../chef/pages/ChefOrdersPage'
 import ChefOrderDetailPage from '../chef/pages/ChefOrderDetailPage'
 import ChefMenuPage from '../chef/pages/ChefMenuPage'
@@ -24,23 +26,23 @@ import UnauthorizedPage from '../pages/UnauthorizedPage'
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/home" replace />} />
 
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/register-restaurant" element={<RegisterRestaurantPage />} />
 
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-      <Route element={<ProtectedRoute allowedRoles={[ROLES.user]} />}>
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/orders/:id" element={<OrderTrackingPage />} />
-      </Route>
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
+      <Route path="/cart" element={<CartPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/orders/:id" element={<OrderTrackingPage />} />
 
       <Route element={<ProtectedRoute allowedRoles={[ROLES.chef]} />}>
         <Route path="/chef-dashboard" element={<ChefDashboardPage />} />
+        <Route path="/chef/restaurant" element={<ChefRestaurantPage />} />
         <Route path="/chef/orders" element={<ChefOrdersPage />} />
         <Route path="/chef/orders/:id" element={<ChefOrderDetailPage />} />
         <Route path="/chef/menu" element={<ChefMenuPage />} />
@@ -56,7 +58,7 @@ export default function AppRoutes() {
         <Route path="/reports" element={<ReportsPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   )
 }

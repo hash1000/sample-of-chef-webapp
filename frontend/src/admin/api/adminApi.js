@@ -24,6 +24,36 @@ export async function fetchAdminRestaurants() {
   return res.data
 }
 
+export async function createAdminRestaurant(payload) {
+  const res = await api.post('/admin/restaurants', payload)
+  return res.data
+}
+
+export async function updateAdminRestaurant(id, payload) {
+  const res = await api.patch(`/admin/restaurants/${id}`, payload)
+  return res.data
+}
+
+export async function approveAdminRestaurant(id) {
+  const res = await api.patch(`/admin/restaurants/${id}/approve`)
+  return res.data
+}
+
+export async function rejectAdminRestaurant(id) {
+  const res = await api.patch(`/admin/restaurants/${id}/reject`)
+  return res.data
+}
+
+export async function blockAdminRestaurant(id) {
+  const res = await api.patch(`/admin/restaurants/${id}/block`)
+  return res.data
+}
+
+export async function unblockAdminRestaurant(id) {
+  const res = await api.patch(`/admin/restaurants/${id}/unblock`)
+  return res.data
+}
+
 export async function fetchAdminOrders() {
   // Recommended endpoint: GET /admin/orders
   const res = await api.get('/admin/orders')

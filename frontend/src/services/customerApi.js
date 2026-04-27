@@ -15,6 +15,11 @@ export async function createOrder(payload) {
   return res.data
 }
 
+export async function confirmOrderPayment(id, sessionId) {
+  const res = await api.post(`/orders/${id}/confirm-payment`, { sessionId })
+  return res.data
+}
+
 export async function getOrder(id) {
   const res = await api.get(`/orders/${id}`)
   return res.data

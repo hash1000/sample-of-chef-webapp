@@ -51,7 +51,7 @@ export default function RestaurantDetailPage() {
             <div>
               <h1 className="m-0 text-2xl font-bold text-slate-950">{restaurant.name}</h1>
               <p className="mt-1 text-sm text-slate-600">
-                Chef-owned storefront with strict order status controls.
+                {restaurant.description || restaurant.menuType || 'Chef-owned storefront with strict order status controls.'}
               </p>
             </div>
             <Link className="btn" to="/cart">

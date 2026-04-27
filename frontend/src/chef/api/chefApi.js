@@ -1,20 +1,21 @@
 import { api, getApiErrorMessage } from '../../services/api'
 
-// Recommended endpoints (implement on backend when ready):
-// GET /chef/orders?status=
-// GET /chef/orders/:id
-// PATCH /chef/orders/:id/status
-// GET /chef/menu
-// POST /chef/menu
-// PATCH /chef/menu/:id
-// DELETE /chef/menu/:id
-
 export function toErrorMessage(err) {
   return getApiErrorMessage(err)
 }
 
 export async function fetchChefOrders({ status } = {}) {
   const res = await api.get('/chef/orders', { params: status ? { status } : undefined })
+  return res.data
+}
+
+export async function fetchChefRestaurant() {
+  const res = await api.get('/chef/restaurant')
+  return res.data
+}
+
+export async function updateChefRestaurant(payload) {
+  const res = await api.patch('/chef/restaurant', payload)
   return res.data
 }
 
@@ -30,6 +31,26 @@ export async function updateChefOrderStatus(id, status) {
 
 export async function fetchChefMenu() {
   const res = await api.get('/chef/menu')
+  return res.data
+}
+
+export async function createChefMenuItem(payload) {
+  const res = await api.post('/chef/menu', payload)
+  return res.data
+}
+
+export async function updateChefMenuItem(id, payload) {
+  const res = await api.patch(`/chef/menu/${id}`, payload)
+  return res.data
+}
+
+export async function deleteChefMenuItem(id) {
+  const res = await api.delete(`/chef/menu/${id}`)
+  return res.data
+}
+
+export async function toggleChefMenuAvailability(id, isAvailable) {
+  const res = await api.patch(`/chef/menu/${id}/availability`, { isAvailable })
   return res.data
 }
 

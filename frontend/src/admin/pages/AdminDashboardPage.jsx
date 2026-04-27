@@ -47,6 +47,8 @@ export default function AdminDashboardPage() {
           <div className="grid4">
             <StatCard label="Total Users" value={data?.totalUsers ?? '—'} />
             <StatCard label="Total Restaurants" value={data?.totalRestaurants ?? '—'} />
+            <StatCard label="Active Restaurants" value={data?.activeApprovedRestaurants ?? '—'} />
+            <StatCard label="Pending Restaurants" value={data?.pendingRestaurants ?? '—'} />
             <StatCard label="Total Orders" value={String(data?.totalOrders ?? 0)} />
             <StatCard label="Total Revenue" value={formatCents(data?.totalRevenue)} />
           </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { getApiErrorMessage } from '../services/api'
 import { createOrder } from '../services/customerApi'
@@ -11,11 +11,21 @@ function money(cents) {
 
 export default function CheckoutPage() {
   const cart = useCart()
-  const navigate = useNavigate()
-  const [deliveryAddress, setDeliveryAddress] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('mock')
+  const [searchParams] = useSearchParams()
+  const [form, setForm] = useState({
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+    deliveryAddress: '',
+  })
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(
+    searchParams.get('canceled') ? 'Stripe payment was canceled. You can try again.' : '',
+  )
+
+  function updateField(field, value) {
+    setForm((current) => ({ ...current, [field]: value }))
+  }
 
   async function onSubmit(event) {
     event.preventDefault()
@@ -24,15 +34,25 @@ export default function CheckoutPage() {
     try {
       const order = await createOrder({
         restaurantId: cart.restaurant?.id,
-        deliveryAddress,
-        paymentMethod,
+        customerName: form.customerName,
+        customerEmail: form.customerEmail,
+        customerPhone: form.customerPhone,
+        deliveryAddress: form.deliveryAddress,
+        paymentMethod: 'stripe',
         items: cart.items.map((item) => ({
           menuItemId: item.id,
           quantity: item.quantity,
         })),
       })
+
+      if (order.checkoutUrl) {
+        cart.clearCart()
+        window.location.assign(order.checkoutUrl)
+        return
+      }
+
       cart.clearCart()
-      navigate(`/orders/${order.id}`)
+      window.location.assign(`/orders/${order.id}`)
     } catch (err) {
       setError(getApiErrorMessage(err))
     } finally {
@@ -45,28 +65,59 @@ export default function CheckoutPage() {
       <form onSubmit={onSubmit} className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <h1 className="m-0 text-2xl font-bold text-slate-950">Checkout</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Enter your delivery details, then complete payment securely on Stripe.
+          </p>
+
+          <div className="grid2">
+            <div className="field">
+              <label htmlFor="customerName">Full name</label>
+              <input
+                id="customerName"
+                value={form.customerName}
+                onChange={(event) => updateField('customerName', event.target.value)}
+                required
+                minLength={2}
+                placeholder="Your name"
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="customerPhone">Phone number</label>
+              <input
+                id="customerPhone"
+                value={form.customerPhone}
+                onChange={(event) => updateField('customerPhone', event.target.value)}
+                required
+                minLength={7}
+                placeholder="03001234567"
+              />
+            </div>
+          </div>
+
+          <div className="field">
+            <label htmlFor="customerEmail">Email</label>
+            <input
+              id="customerEmail"
+              type="email"
+              value={form.customerEmail}
+              onChange={(event) => updateField('customerEmail', event.target.value)}
+              required
+              placeholder="you@example.com"
+            />
+          </div>
+
           <div className="field">
             <label htmlFor="address">Delivery address</label>
             <input
               id="address"
-              value={deliveryAddress}
-              onChange={(event) => setDeliveryAddress(event.target.value)}
+              value={form.deliveryAddress}
+              onChange={(event) => updateField('deliveryAddress', event.target.value)}
               required
               minLength={8}
-              placeholder="Street, city, state, ZIP"
+              placeholder="House, street, area, city"
             />
           </div>
-          <div className="field">
-            <label htmlFor="payment">Payment</label>
-            <select
-              id="payment"
-              value={paymentMethod}
-              onChange={(event) => setPaymentMethod(event.target.value)}
-            >
-              <option value="mock">Mock payment</option>
-              <option value="stripe">Stripe-ready mock</option>
-            </select>
-          </div>
+
           {error ? <div className="error">{error}</div> : null}
         </div>
 
@@ -84,9 +135,15 @@ export default function CheckoutPage() {
               <strong>{money(cart.total)}</strong>
             </div>
           </div>
-          <button className="btn mt-5 w-full" type="submit" disabled={submitting || !cart.items.length}>
-            {submitting ? 'Placing order...' : 'Place order'}
-          </button>
+          {cart.items.length ? (
+            <button className="btn mt-5 w-full" type="submit" disabled={submitting}>
+              {submitting ? 'Opening Stripe...' : 'Pay with Stripe'}
+            </button>
+          ) : (
+            <Link className="btn mt-5 inline-flex w-full justify-center" to="/home">
+              Browse restaurants
+            </Link>
+          )}
         </aside>
       </form>
     </AuthedLayout>

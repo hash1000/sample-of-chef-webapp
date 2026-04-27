@@ -16,9 +16,15 @@ function badgeClass(status) {
   if (s === 'pending') return 'badge warn'
   if (s === 'accepted') return 'badge warn'
   if (s === 'preparing') return 'badge warn'
-  if (s === 'ready') return 'badge ok'
+  if (s === 'ready' || s === 'dispatched') return 'badge ok'
   if (s === 'delivered' || s === 'completed') return 'badge ok'
   return 'badge'
+}
+
+function statusLabel(status) {
+  if (status === 'ready') return 'dispatched'
+  if (status === 'delivered') return 'completed'
+  return status || '—'
 }
 
 export default function ChefOrdersPage() {
@@ -131,7 +137,7 @@ export default function ChefOrdersPage() {
                   <td>{o.user?.name || o.customerName || '—'}</td>
                   <td>{o.items?.length ? `${o.items.length} items` : '—'}</td>
                   <td>
-                    <span className={badgeClass(o.status)}>{o.status || '—'}</span>
+                    <span className={badgeClass(o.status)}>{statusLabel(o.status)}</span>
                   </td>
                   <td>{o.createdAt ? new Date(o.createdAt).toLocaleString() : '—'}</td>
                   <td>
@@ -159,9 +165,17 @@ export default function ChefOrdersPage() {
                         className="btnSecondary"
                         type="button"
                         disabled={updatingId === o.id || o.status !== 'preparing'}
-                        onClick={() => updateStatus(o.id, 'ready')}
+                        onClick={() => updateStatus(o.id, 'dispatched')}
                       >
-                        Ready
+                        Dispatched
+                      </button>
+                      <button
+                        className="btnSecondary"
+                        type="button"
+                        disabled={updatingId === o.id || o.status !== 'ready'}
+                        onClick={() => updateStatus(o.id, 'completed')}
+                      >
+                        Completed
                       </button>
                     </div>
                   </td>

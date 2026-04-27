@@ -89,6 +89,9 @@ export default function LoginPage() {
             <Link className="link" to="/signup">
               Create account
             </Link>
+            <Link className="link" to="/register-restaurant">
+              Register Restaurant
+            </Link>
           </div>
         </form>
       </div>

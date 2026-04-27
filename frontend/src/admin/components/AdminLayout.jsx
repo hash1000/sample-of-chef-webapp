@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import '../../pages/ui.css'
 
 const nav = [
+  { to: '/home', label: 'Public Home' },
   { to: '/admin-dashboard', label: 'Dashboard' },
   { to: '/users', label: 'Users' },
   { to: '/restaurants', label: 'Restaurants' },

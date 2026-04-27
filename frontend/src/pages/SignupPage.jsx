@@ -13,7 +13,6 @@ export default function SignupPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [selectedRole, setSelectedRole] = useState(ROLES.user)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -30,7 +29,7 @@ export default function SignupPage() {
         name,
         email,
         password,
-        role: selectedRole,
+        role: ROLES.user,
       })
       if (!data?.token || !data?.user) {
         throw new Error('Invalid server response')
@@ -48,7 +47,7 @@ export default function SignupPage() {
     <div className="container">
       <div className="card">
         <h1 className="title">Create account</h1>
-        <p className="muted">Sign up with a role.</p>
+        <p className="muted">Create a customer account for ordering food.</p>
 
         <form onSubmit={onSubmit}>
           <div className="field">
@@ -93,19 +92,6 @@ export default function SignupPage() {
             />
           </div>
 
-          <div className="field">
-            <label htmlFor="role">Role</label>
-            <select
-              id="role"
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              disabled={isSubmitting}
-            >
-              <option value={ROLES.user}>user</option>
-              <option value={ROLES.chef}>chef</option>
-            </select>
-          </div>
-
           {error ? (
             <div className="error" role="alert">
               {error}
@@ -118,6 +104,9 @@ export default function SignupPage() {
             </button>
             <Link className="link" to="/login">
               Back to login
+            </Link>
+            <Link className="link" to="/register-restaurant">
+              Register Restaurant
             </Link>
           </div>
         </form>

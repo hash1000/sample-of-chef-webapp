@@ -19,3 +19,8 @@ export async function signup({ name, email, password, role }) {
   return normalizeAuthResponse(res.data)
 }
 
+export async function registerRestaurant(payload) {
+  const res = await api.post('/auth/register-restaurant', payload)
+  return normalizeAuthResponse(res.data)
+}
+

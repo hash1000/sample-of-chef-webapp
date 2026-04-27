@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom'
 
-export default function RestaurantCard({ restaurant }) {
+const CITY_LABELS = {
+  islamabad: 'Islamabad',
+  karachi: 'Karachi',
+  lahore: 'Lahore',
+}
+
+export default function RestaurantCard({ restaurant, featured = false }) {
   return (
     <Link
       to={`/restaurant/${restaurant.id}`}
@@ -12,7 +18,7 @@ export default function RestaurantCard({ restaurant }) {
             {restaurant.name}
           </div>
           <div className="mt-1 text-sm text-slate-500">
-            {restaurant.menuItems?.[0]?.category || 'American favorites'}
+            {restaurant.menuType || restaurant.menuItems?.[0]?.category || 'Local favorites'}
           </div>
         </div>
         <div className="rounded-xl bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
@@ -21,7 +27,12 @@ export default function RestaurantCard({ restaurant }) {
       </div>
 
       <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
-        <span>{restaurant.menuItems?.length ?? 0} featured items</span>
+        <span>{CITY_LABELS[restaurant.city] || 'Selected city'}</span>
+        {featured ? <span className="font-semibold text-slate-900">Featured</span> : null}
+      </div>
+
+      <div className="mt-3 flex items-center justify-between text-sm text-slate-600">
+        <span>{restaurant.menuItems?.length ?? 0} menu previews</span>
         <span className="text-slate-900 group-hover:underline">View menu</span>
       </div>
     </Link>

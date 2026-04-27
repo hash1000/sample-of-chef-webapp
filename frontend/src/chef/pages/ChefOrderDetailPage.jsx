@@ -10,6 +10,12 @@ function money(cents) {
   return `$${(cents / 100).toFixed(2)}`
 }
 
+function statusLabel(status) {
+  if (status === 'ready') return 'dispatched'
+  if (status === 'delivered') return 'completed'
+  return status || '—'
+}
+
 export default function ChefOrderDetailPage() {
   const { id } = useParams()
   const [loading, setLoading] = useState(true)
@@ -78,7 +84,7 @@ export default function ChefOrderDetailPage() {
             <div className="muted" style={{ fontSize: 13 }}>
               Customer: {order?.user?.name || order?.customerName || '—'}
               <br />
-              Status: <span className="badge">{order?.status || '—'}</span>
+              Status: <span className="badge">{statusLabel(order?.status)}</span>
               <br />
               Created: {order?.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}
             </div>
@@ -87,7 +93,7 @@ export default function ChefOrderDetailPage() {
           <div className="statCard">
             <strong>Actions</strong>
             <p className="muted" style={{ marginTop: 8, fontSize: 13 }}>
-              Marking ready automatically delivers the order.
+              Move the order from preparing to dispatched, then mark it completed.
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
               <button
@@ -110,9 +116,17 @@ export default function ChefOrderDetailPage() {
                 className="btnSecondary"
                 type="button"
                 disabled={updating || order?.status !== 'preparing'}
-                onClick={() => updateStatus('ready')}
+                onClick={() => updateStatus('dispatched')}
               >
-                Ready for pickup
+                Dispatched
+              </button>
+              <button
+                className="btnSecondary"
+                type="button"
+                disabled={updating || order?.status !== 'ready'}
+                onClick={() => updateStatus('completed')}
+              >
+                Completed
               </button>
             </div>
           </div>

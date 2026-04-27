@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import ChefLayout from '../components/ChefLayout'
 import DataState from '../../admin/components/DataState'
 import StatCard from '../../admin/components/StatCard'
-import { fetchChefOrders, toErrorMessage } from '../api/chefApi'
+import { fetchChefOrders, fetchChefRestaurant, toErrorMessage } from '../api/chefApi'
 import '../../pages/ui.css'
 
 function statusBadge(status) {
@@ -15,10 +15,17 @@ function statusBadge(status) {
   return 'badge'
 }
 
+function statusLabel(status) {
+  if (status === 'ready') return 'dispatched'
+  if (status === 'delivered') return 'completed'
+  return status || '—'
+}
+
 export default function ChefDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [orders, setOrders] = useState([])
+  const [restaurant, setRestaurant] = useState(null)
 
   useEffect(() => {
     let alive = true
@@ -26,6 +33,13 @@ export default function ChefDashboardPage() {
       setLoading(true)
       setError('')
       try {
+        const mine = await fetchChefRestaurant()
+        if (!alive) return
+        setRestaurant(mine)
+        if (mine?.status !== 'approved' || mine?.isActive === false) {
+          setOrders([])
+          return
+        }
         const data = await fetchChefOrders()
         if (!alive) return
         const items = Array.isArray(data) ? data : data?.items || []
@@ -66,6 +80,16 @@ export default function ChefDashboardPage() {
         </Link>
       }
     >
+      {restaurant && restaurant.status !== 'approved' ? (
+        <div className="statCard" style={{ marginBottom: 12 }}>
+          <strong>{restaurant.name}</strong>
+          <p className="muted" style={{ marginTop: 8 }}>
+            Your restaurant is currently {restaurant.status}. Admin approval is required before
+            menu and order tools are available.
+          </p>
+        </div>
+      ) : null}
+
       <DataState loading={loading} error={error} empty={!loading && !error && orders.length === 0}>
         <div style={{ display: 'grid', gap: 12 }}>
           <div className="grid4">
@@ -97,7 +121,7 @@ export default function ChefDashboardPage() {
                     <td>{o.user?.name || o.customerName || '—'}</td>
                     <td>{o.items?.length ? `${o.items.length} items` : '—'}</td>
                     <td>
-                      <span className={statusBadge(o.status)}>{o.status || '—'}</span>
+                      <span className={statusBadge(o.status)}>{statusLabel(o.status)}</span>
                     </td>
                     <td>{o.createdAt ? new Date(o.createdAt).toLocaleString() : '—'}</td>
                   </tr>

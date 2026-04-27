@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import ChefLayout from '../components/ChefLayout'
 import DataState from '../../admin/components/DataState'
-import { fetchChefMenu, toErrorMessage } from '../api/chefApi'
+import {
+  createChefMenuItem,
+  deleteChefMenuItem,
+  fetchChefMenu,
+  fetchChefRestaurant,
+  toErrorMessage,
+  toggleChefMenuAvailability,
+  updateChefMenuItem,
+} from '../api/chefApi'
 import '../../pages/ui.css'
 
 function centsToDollars(cents) {
@@ -9,22 +17,44 @@ function centsToDollars(cents) {
   return `$${(cents / 100).toFixed(2)}`
 }
 
+const emptyForm = {
+  id: '',
+  name: '',
+  priceCents: '',
+  category: '',
+  description: '',
+  isAvailable: true,
+}
+
 export default function ChefMenuPage() {
   const [q, setQ] = useState('')
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [items, setItems] = useState([])
-
-  // local-only form state (until backend endpoints exist)
+  const [restaurant, setRestaurant] = useState(null)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({
-    name: '',
-    priceCents: 0,
-    category: '',
-    description: '',
-    available: true,
-    imageUrl: '',
-  })
+  const [form, setForm] = useState(emptyForm)
+
+  async function loadMenu() {
+    setLoading(true)
+    setError('')
+    try {
+      const mine = await fetchChefRestaurant()
+      setRestaurant(mine)
+      if (mine?.status !== 'approved' || mine?.isActive === false) {
+        setItems([])
+        return
+      }
+
+      const data = await fetchChefMenu()
+      setItems(Array.isArray(data) ? data : data?.items || [])
+    } catch (e) {
+      setError(toErrorMessage(e) || 'Unable to load menu.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     let alive = true
@@ -32,16 +62,19 @@ export default function ChefMenuPage() {
       setLoading(true)
       setError('')
       try {
+        const mine = await fetchChefRestaurant()
+        if (!alive) return
+        setRestaurant(mine)
+        if (mine?.status !== 'approved' || mine?.isActive === false) {
+          setItems([])
+          return
+        }
         const data = await fetchChefMenu()
         if (!alive) return
-        const rows = Array.isArray(data) ? data : data?.items || []
-        setItems(rows)
+        setItems(Array.isArray(data) ? data : data?.items || [])
       } catch (e) {
         if (!alive) return
-        setError(
-          toErrorMessage(e) ||
-            'Chef menu endpoint not available yet (expected: GET /chef/menu).',
-        )
+        setError(toErrorMessage(e) || 'Unable to load menu.')
       } finally {
         if (!alive) return
         setLoading(false)
@@ -61,57 +94,133 @@ export default function ChefMenuPage() {
     })
   }, [items, q])
 
+  function updateField(field, value) {
+    setForm((current) => ({ ...current, [field]: value }))
+  }
+
   function onOpenAdd() {
+    setForm(emptyForm)
+    setShowForm(true)
+  }
+
+  function onOpenEdit(item) {
     setForm({
-      name: '',
-      priceCents: 0,
-      category: '',
-      description: '',
-      available: true,
-      imageUrl: '',
+      id: item.id,
+      name: item.name || '',
+      priceCents: String(item.priceCents ?? ''),
+      category: item.category || '',
+      description: item.description || '',
+      isAvailable: item.isAvailable !== false,
     })
     setShowForm(true)
   }
 
-  function onSaveLocal() {
-    const name = form.name.trim()
-    if (!name) return
-    setItems((prev) => [
-      { id: `local-${Date.now()}`, ...form, name, priceCents: Number(form.priceCents) || 0 },
-      ...prev,
-    ])
-    setShowForm(false)
+  async function onSave(event) {
+    event.preventDefault()
+    setSaving(true)
+    setError('')
+    const payload = {
+      name: form.name.trim(),
+      priceCents: Number(form.priceCents) || 0,
+      category: form.category.trim(),
+      description: form.description.trim(),
+    }
+
+    try {
+      if (form.id) {
+        const updated = await updateChefMenuItem(form.id, {
+          ...payload,
+          isAvailable: form.isAvailable,
+        })
+        setItems((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+      } else {
+        let created = await createChefMenuItem(payload)
+        if (!form.isAvailable) {
+          created = await toggleChefMenuAvailability(created.id, false)
+        }
+        setItems((current) => [created, ...current])
+      }
+      setShowForm(false)
+      setForm(emptyForm)
+    } catch (e) {
+      setError(toErrorMessage(e))
+    } finally {
+      setSaving(false)
+    }
   }
 
+  async function onToggle(item) {
+    setSaving(true)
+    setError('')
+    try {
+      const updated = await toggleChefMenuAvailability(item.id, item.isAvailable === false)
+      setItems((current) => current.map((row) => (row.id === updated.id ? updated : row)))
+    } catch (e) {
+      setError(toErrorMessage(e))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function onDelete(item) {
+    if (!window.confirm(`Delete ${item.name}?`)) return
+    setSaving(true)
+    setError('')
+    try {
+      await deleteChefMenuItem(item.id)
+      setItems((current) => current.filter((row) => row.id !== item.id))
+    } catch (e) {
+      setError(toErrorMessage(e))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const locked = restaurant && (restaurant.status !== 'approved' || restaurant.isActive === false)
+
   return (
-    <ChefLayout title="Menu" subtitle="Manage menu items (CRUD + availability)">
+    <ChefLayout title="Menu" subtitle="Manage menu items and availability">
+      {locked ? (
+        <div className="statCard" style={{ marginBottom: 12 }}>
+          <strong>{restaurant.name}</strong>
+          <p className="muted" style={{ marginTop: 8 }}>
+            Your restaurant is {restaurant.status}. Admin approval is required before menu items can
+            be managed.
+          </p>
+        </div>
+      ) : null}
+
       <div className="toolbar">
         <div className="toolbarLeft">
           <input
             className="input"
-            placeholder="Search name/category…"
+            placeholder="Search name/category..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
           <span className="badge">{filtered.length} items</span>
         </div>
         <div className="toolbarRight">
-          <button className="btn" type="button" onClick={onOpenAdd}>
+          <button className="btnSecondary" type="button" onClick={loadMenu}>
+            Refresh
+          </button>
+          <button className="btn" type="button" onClick={onOpenAdd} disabled={Boolean(locked)}>
             Add item
           </button>
         </div>
       </div>
 
       {showForm ? (
-        <div className="statCard" style={{ marginBottom: 12 }}>
-          <strong>Add / Edit food item</strong>
+        <form className="statCard" style={{ marginBottom: 12 }} onSubmit={onSave}>
+          <strong>{form.id ? 'Edit food item' : 'Add food item'}</strong>
           <div className="grid2" style={{ marginTop: 12 }}>
             <div className="field" style={{ marginTop: 0 }}>
               <label>Name</label>
               <input
                 className="input"
                 value={form.name}
-                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                onChange={(e) => updateField('name', e.target.value)}
+                required
               />
             </div>
             <div className="field" style={{ marginTop: 0 }}>
@@ -119,8 +228,10 @@ export default function ChefMenuPage() {
               <input
                 className="input"
                 type="number"
+                min="0"
                 value={form.priceCents}
-                onChange={(e) => setForm((p) => ({ ...p, priceCents: e.target.value }))}
+                onChange={(e) => updateField('priceCents', e.target.value)}
+                required
               />
             </div>
             <div className="field" style={{ marginTop: 0 }}>
@@ -128,16 +239,20 @@ export default function ChefMenuPage() {
               <input
                 className="input"
                 value={form.category}
-                onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+                onChange={(e) => updateField('category', e.target.value)}
+                required
               />
             </div>
             <div className="field" style={{ marginTop: 0 }}>
-              <label>Image URL (optional)</label>
-              <input
+              <label>Availability</label>
+              <select
                 className="input"
-                value={form.imageUrl}
-                onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
-              />
+                value={form.isAvailable ? 'yes' : 'no'}
+                onChange={(e) => updateField('isAvailable', e.target.value === 'yes')}
+              >
+                <option value="yes">Available</option>
+                <option value="no">Unavailable</option>
+              </select>
             </div>
           </div>
 
@@ -146,33 +261,19 @@ export default function ChefMenuPage() {
             <input
               className="input"
               value={form.description}
-              onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+              onChange={(e) => updateField('description', e.target.value)}
             />
           </div>
 
           <div className="row">
-            <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <input
-                type="checkbox"
-                checked={form.available}
-                onChange={(e) => setForm((p) => ({ ...p, available: e.target.checked }))}
-              />
-              Available
-            </label>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btnSecondary" type="button" onClick={() => setShowForm(false)}>
-                Cancel
-              </button>
-              <button className="btn" type="button" onClick={onSaveLocal}>
-                Save (local)
-              </button>
-            </div>
+            <button className="btnSecondary" type="button" onClick={() => setShowForm(false)}>
+              Cancel
+            </button>
+            <button className="btn" type="submit" disabled={saving}>
+              {saving ? 'Saving...' : 'Save item'}
+            </button>
           </div>
-
-          <p className="muted" style={{ marginTop: 10, fontSize: 13 }}>
-            Hook this form to backend endpoints like `POST /chef/menu` and `PATCH /chef/menu/:id`.
-          </p>
-        </div>
+        </form>
       ) : null}
 
       <DataState loading={loading} error={error} empty={!loading && !error && filtered.length === 0}>
@@ -190,23 +291,28 @@ export default function ChefMenuPage() {
             <tbody>
               {filtered.map((it) => (
                 <tr key={it.id || it.name}>
-                  <td>{it.name || '—'}</td>
+                  <td>
+                    <strong>{it.name || '—'}</strong>
+                    <div className="muted" style={{ fontSize: 12 }}>
+                      {it.description || '—'}
+                    </div>
+                  </td>
                   <td>{it.category || '—'}</td>
                   <td>{centsToDollars(it.priceCents ?? it.price ?? it.unitPrice)}</td>
                   <td>
-                    <span className={it.available === false ? 'badge bad' : 'badge ok'}>
-                      {it.available === false ? 'unavailable' : 'available'}
+                    <span className={it.isAvailable === false ? 'badge bad' : 'badge ok'}>
+                      {it.isAvailable === false ? 'unavailable' : 'available'}
                     </span>
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      <button className="btnSecondary" type="button">
+                      <button className="btnSecondary" type="button" onClick={() => onOpenEdit(it)}>
                         Edit
                       </button>
-                      <button className="btnSecondary" type="button">
-                        Toggle
+                      <button className="btnSecondary" type="button" disabled={saving} onClick={() => onToggle(it)}>
+                        {it.isAvailable === false ? 'Enable' : 'Disable'}
                       </button>
-                      <button className="btnDanger" type="button">
+                      <button className="btnDanger" type="button" disabled={saving} onClick={() => onDelete(it)}>
                         Delete
                       </button>
                     </div>
@@ -220,4 +326,3 @@ export default function ChefMenuPage() {
     </ChefLayout>
   )
 }
-
