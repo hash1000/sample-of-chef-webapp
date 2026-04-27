@@ -25,7 +25,7 @@ export default function FoodItemCard({ item, onAdd }) {
           type="button"
           onClick={() => onAdd(item)}
           disabled={!item.isAvailable}
-          className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          className="rounded-xl bg-brand-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-primaryHover disabled:opacity-60"
         >
           {item.isAvailable ? 'Add to cart' : 'Unavailable'}
         </button>

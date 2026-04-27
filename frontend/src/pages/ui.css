@@ -62,11 +62,22 @@
 
 .btn {
   border: 1px solid var(--accent-border);
-  background: var(--accent-bg);
-  color: var(--text-h);
+  background: var(--accent);
+  color: #fff;
   padding: 10px 14px;
   border-radius: 10px;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
 .btn[disabled] {
@@ -310,8 +321,8 @@ table.adminTable tr:last-child td {
 }
 
 .btnDanger {
-  border: 1px solid rgba(255, 0, 0, 0.3);
-  background: rgba(255, 0, 0, 0.08);
+  border: 1px solid color-mix(in oklab, var(--error) 30%, transparent);
+  background: color-mix(in oklab, var(--error) 12%, transparent);
   color: var(--text-h);
   padding: 10px 14px;
   border-radius: 10px;
@@ -329,18 +340,18 @@ table.adminTable tr:last-child td {
 }
 
 .badge.ok {
-  border-color: rgba(0, 200, 0, 0.25);
-  background: rgba(0, 200, 0, 0.08);
+  border-color: color-mix(in oklab, var(--success) 30%, transparent);
+  background: color-mix(in oklab, var(--success) 12%, transparent);
 }
 
 .badge.warn {
-  border-color: rgba(255, 180, 0, 0.25);
-  background: rgba(255, 180, 0, 0.08);
+  border-color: color-mix(in oklab, var(--warning) 35%, transparent);
+  background: color-mix(in oklab, var(--warning) 14%, transparent);
 }
 
 .badge.bad {
-  border-color: rgba(255, 0, 0, 0.25);
-  background: rgba(255, 0, 0, 0.08);
+  border-color: color-mix(in oklab, var(--error) 30%, transparent);
+  background: color-mix(in oklab, var(--error) 12%, transparent);
 }
 
 @media (max-width: 960px) {

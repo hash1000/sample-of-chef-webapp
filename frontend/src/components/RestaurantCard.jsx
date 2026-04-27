@@ -21,7 +21,7 @@ export default function RestaurantCard({ restaurant, featured = false }) {
             {restaurant.menuType || restaurant.menuItems?.[0]?.category || 'Local favorites'}
           </div>
         </div>
-        <div className="rounded-xl bg-slate-900 px-2 py-1 text-xs font-semibold text-white">
+        <div className="rounded-xl bg-brand-secondary px-2 py-1 text-xs font-semibold text-white">
           ★ {restaurant.rating ?? '—'}
         </div>
       </div>
