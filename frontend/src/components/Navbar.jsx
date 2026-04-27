@@ -37,9 +37,6 @@ export default function Navbar() {
           <NavLink to="/home" className={navLinkClass}>
             Home
           </NavLink>
-          <NavLink to="/restaurants" className={navLinkClass}>
-            Restaurants
-          </NavLink>
           <NavLink to="/cart" className={navLinkClass}>
             Cart
           </NavLink>

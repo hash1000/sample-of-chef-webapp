@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { getApiErrorMessage } from '../services/api'
 import { createOrder } from '../services/customerApi'
-import AuthedLayout from './AuthedLayout'
+import CustomerLayout from './CustomerLayout'
 
 function money(cents) {
   return `$${(Number(cents || 0) / 100).toFixed(2)}`
@@ -61,7 +61,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <AuthedLayout title="Checkout">
+    <CustomerLayout>
       <form onSubmit={onSubmit} className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <h1 className="m-0 text-2xl font-bold text-slate-950">Checkout</h1>
@@ -146,6 +146,6 @@ export default function CheckoutPage() {
           )}
         </aside>
       </form>
-    </AuthedLayout>
+    </CustomerLayout>
   )
 }

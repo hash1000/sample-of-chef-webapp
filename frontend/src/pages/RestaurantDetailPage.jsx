@@ -4,7 +4,7 @@ import FoodItemCard from '../components/FoodItemCard'
 import { useCart } from '../context/CartContext'
 import { getApiErrorMessage } from '../services/api'
 import { getRestaurant } from '../services/customerApi'
-import AuthedLayout from './AuthedLayout'
+import CustomerLayout from './CustomerLayout'
 
 export default function RestaurantDetailPage() {
   const { id } = useParams()
@@ -42,7 +42,7 @@ export default function RestaurantDetailPage() {
   }, [restaurant])
 
   return (
-    <AuthedLayout title="Restaurant">
+    <CustomerLayout>
       {loading ? <div className="muted">Loading menu...</div> : null}
       {error ? <div className="error">{error}</div> : null}
       {restaurant ? (
@@ -77,6 +77,6 @@ export default function RestaurantDetailPage() {
           ))}
         </div>
       ) : null}
-    </AuthedLayout>
+    </CustomerLayout>
   )
 }

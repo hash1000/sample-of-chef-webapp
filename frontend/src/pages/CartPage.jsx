@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import CartItem from '../components/CartItem'
 import { useCart } from '../context/CartContext'
-import AuthedLayout from './AuthedLayout'
+import CustomerLayout from './CustomerLayout'
 
 function money(cents) {
   return `$${(Number(cents || 0) / 100).toFixed(2)}`
@@ -11,7 +11,7 @@ export default function CartPage() {
   const cart = useCart()
 
   return (
-    <AuthedLayout title="Cart">
+    <CustomerLayout>
       <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="space-y-3">
           <h1 className="m-0 text-2xl font-bold text-slate-950">Your cart</h1>
@@ -57,6 +57,6 @@ export default function CartPage() {
           </Link>
         </aside>
       </div>
-    </AuthedLayout>
+    </CustomerLayout>
   )
 }

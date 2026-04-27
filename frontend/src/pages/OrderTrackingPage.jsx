@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { getApiErrorMessage } from '../services/api'
 import { confirmOrderPayment, getOrder } from '../services/customerApi'
-import AuthedLayout from './AuthedLayout'
+import CustomerLayout from './CustomerLayout'
 
 const STATUSES = ['pending', 'accepted', 'preparing', 'ready', 'delivered']
 
@@ -68,7 +68,7 @@ export default function OrderTrackingPage() {
   }
 
   return (
-    <AuthedLayout title="Order tracking">
+    <CustomerLayout>
       {loading ? <div className="muted">Loading order...</div> : null}
       {error ? <div className="error">{error}</div> : null}
       {paymentMessage ? <div className="badge ok">{paymentMessage}</div> : null}
@@ -113,6 +113,6 @@ export default function OrderTrackingPage() {
           </div>
         </div>
       ) : null}
-    </AuthedLayout>
+    </CustomerLayout>
   )
 }

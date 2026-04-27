@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import RestaurantCard from '../components/RestaurantCard'
 import { getApiErrorMessage } from '../services/api'
 import { listRestaurants } from '../services/customerApi'
-import AuthedLayout from './AuthedLayout'
+import CustomerLayout from './CustomerLayout'
 
 const CITIES = [
   { value: 'islamabad', label: 'Islamabad' },
@@ -56,7 +56,7 @@ export default function HomePage() {
   const featured = restaurants.slice(0, 3)
 
   return (
-    <AuthedLayout title="AmericanDemoFood">
+    <CustomerLayout>
       <div className="space-y-6">
         {!city ? (
           <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 px-4">
@@ -152,7 +152,7 @@ export default function HomePage() {
           </div>
         )}
       </div>
-    </AuthedLayout>
+    </CustomerLayout>
   )
 }
 

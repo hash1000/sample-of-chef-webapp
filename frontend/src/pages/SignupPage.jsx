@@ -4,7 +4,6 @@ import { signup } from '../auth/authService'
 import { ROLES, roleHomePath } from '../auth/roles'
 import { useAuth } from '../context/AuthContext'
 import { getApiErrorMessage } from '../services/api'
-import './ui.css'
 
 export default function SignupPage() {
   const { isBootstrapping, isAuthenticated, role, loginSuccess } = useAuth()
@@ -73,7 +72,6 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isSubmitting}
-              className="!border-gray-500"
             />
           </div>
 
@@ -88,7 +86,6 @@ export default function SignupPage() {
               required
               disabled={isSubmitting}
               minLength={6}
-              className="!border-gray-500"
             />
           </div>
 

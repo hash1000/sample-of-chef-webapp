@@ -4,7 +4,6 @@ import { registerRestaurant } from '../auth/authService'
 import { roleHomePath } from '../auth/roles'
 import { useAuth } from '../context/AuthContext'
 import { getApiErrorMessage } from '../services/api'
-import './ui.css'
 
 const CITIES = [
   { value: 'islamabad', label: 'Islamabad' },
