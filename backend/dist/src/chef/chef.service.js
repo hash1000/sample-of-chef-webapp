@@ -55,6 +55,16 @@ let ChefService = class ChefService {
             },
         });
     }
+    async updateRestaurantBanner(chefId, bannerImageUrl) {
+        const restaurant = await this.getChefRestaurantOrThrow(chefId, false);
+        if (restaurant.status === client_1.RestaurantStatus.blocked) {
+            throw new common_1.ForbiddenException('Blocked restaurant cannot be updated');
+        }
+        return this.prisma.restaurant.update({
+            where: { id: restaurant.id },
+            data: { bannerImageUrl },
+        });
+    }
     async listOrders(chefId, query) {
         const restaurant = await this.getChefRestaurantOrThrow(chefId);
         const { page, limit, skip } = pageParams(query);
@@ -162,6 +172,18 @@ let ChefService = class ChefService {
                 description: dto.description?.trim(),
                 isAvailable: dto.isAvailable,
             },
+        });
+    }
+    async updateMenuItemImage(chefId, id, imageUrl) {
+        const restaurant = await this.getChefRestaurantOrThrow(chefId);
+        const item = await this.prisma.menuItem.findUnique({ where: { id } });
+        if (!item)
+            throw new common_1.NotFoundException('Menu item not found');
+        if (item.restaurantId !== restaurant.id)
+            throw new common_1.ForbiddenException('Forbidden');
+        return this.prisma.menuItem.update({
+            where: { id },
+            data: { imageUrl },
         });
     }
     async deleteMenuItem(chefId, id) {

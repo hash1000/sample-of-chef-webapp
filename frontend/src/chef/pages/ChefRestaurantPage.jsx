@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import ChefLayout from '../components/ChefLayout'
 import DataState from '../../admin/components/DataState'
-import { fetchChefRestaurant, toErrorMessage, updateChefRestaurant } from '../api/chefApi'
+import { imageForRestaurant } from '../../assets/foodImages'
+import {
+  fetchChefRestaurant,
+  toErrorMessage,
+  updateChefRestaurant,
+  uploadChefRestaurantBanner,
+} from '../api/chefApi'
 import '../../pages/ui.css'
 
 const CITIES = [
@@ -78,6 +84,24 @@ export default function ChefRestaurantPage() {
     }
   }
 
+  async function onBannerChange(event) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setSaving(true)
+    setError('')
+    setMessage('')
+    try {
+      const updated = await uploadChefRestaurantBanner(file)
+      setRestaurant(updated)
+      setMessage('Banner image uploaded.')
+    } catch (e) {
+      setError(toErrorMessage(e))
+    } finally {
+      setSaving(false)
+      event.target.value = ''
+    }
+  }
+
   return (
     <ChefLayout title="Restaurant" subtitle="Restaurant profile and approval status">
       <DataState loading={loading} error={error} empty={!loading && !error && !restaurant}>
@@ -115,6 +139,39 @@ export default function ChefRestaurantPage() {
                 </p>
               </div>
             ) : null}
+
+            <div className="statCard">
+              <strong>Banner image</strong>
+              <div
+                style={{
+                  marginTop: 12,
+                  overflow: 'hidden',
+                  borderRadius: 14,
+                  border: '1px solid var(--border)',
+                  background: 'var(--code-bg)',
+                }}
+              >
+                <img
+                  src={imageForRestaurant(restaurant)}
+                  alt=""
+                  style={{ display: 'block', width: '100%', maxHeight: 280, objectFit: 'cover' }}
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="restaurantBanner">Upload banner image</label>
+                <input
+                  id="restaurantBanner"
+                  className="input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  onChange={onBannerChange}
+                  disabled={saving || restaurant.status === 'blocked'}
+                />
+              </div>
+              <p className="muted" style={{ marginTop: 8, fontSize: 13 }}>
+                Images are saved locally in backend/uploads/restaurants and served from /uploads.
+              </p>
+            </div>
 
             <form className="statCard" onSubmit={onSubmit}>
               <strong>Profile</strong>

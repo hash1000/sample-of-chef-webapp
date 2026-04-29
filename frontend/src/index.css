@@ -8,14 +8,14 @@
 
     /* CSS custom properties for ui.css */
     --bg: #ffffff;
-    --bg-light: #f8f9fb;
+    --bg-light: #f6f7f8;
 
-    --text-h: #1c1c1c;
-    --text: #6b6b6b;
+    --text-h: #171717;
+    --text: #5f646d;
     --text-muted: #9e9e9e;
 
-    --border: #e5e7eb;
-    --code-bg: #f8f9fb;
+    --border: #e4e7ec;
+    --code-bg: #fbfbfc;
 
     --accent: #e23744;
     --accent-hover: #c92f3a;
@@ -27,13 +27,26 @@
     --warning: #facc15;
     --error: #ef4444;
 
-    --shadow: 0 8px 24px rgba(28, 28, 28, 0.08);
+    --shadow: 0 18px 45px rgba(17, 24, 39, 0.09);
     --social-bg: #f3f4f6;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
     background: var(--bg-light);
     color: var(--text-h);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  a,
+  input,
+  select {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 

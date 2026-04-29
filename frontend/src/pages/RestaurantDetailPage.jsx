@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { imageForRestaurant } from '../assets/foodImages'
 import FoodItemCard from '../components/FoodItemCard'
 import { useCart } from '../context/CartContext'
 import { getApiErrorMessage } from '../services/api'
@@ -47,17 +48,33 @@ export default function RestaurantDetailPage() {
       {error ? <div className="error">{error}</div> : null}
       {restaurant ? (
         <div className="space-y-5">
-          <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="m-0 text-2xl font-bold text-slate-950">{restaurant.name}</h1>
-              <p className="mt-1 text-sm text-slate-600">
-                {restaurant.description || restaurant.menuType || 'Chef-owned storefront with strict order status controls.'}
-              </p>
+          <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
+            <img
+              src={imageForRestaurant(restaurant)}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/55 to-slate-950/10" />
+            <div className="relative flex min-h-72 flex-col justify-end gap-5 px-5 py-6 sm:px-8 md:flex-row md:items-end md:justify-between md:py-8">
+              <div className="max-w-2xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+                    {restaurant.menuType || 'Restaurant'}
+                  </span>
+                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+                    ★ {restaurant.rating ?? '-'}
+                  </span>
+                </div>
+                <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-5xl">{restaurant.name}</h1>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-white/80 sm:text-base">
+                  {restaurant.description || restaurant.menuType || 'Chef-owned storefront with strict order status controls.'}
+                </p>
+              </div>
+              <Link className="btn shrink-0" to="/cart">
+                Cart ({cart.count})
+              </Link>
             </div>
-            <Link className="btn" to="/cart">
-              Cart ({cart.count})
-            </Link>
-          </div>
+          </section>
 
           {categories.map(([categoryName, items]) => (
             <section key={categoryName} className="space-y-3">

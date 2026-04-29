@@ -69,6 +69,7 @@ model Restaurant {
   status      RestaurantStatus @default(pending)
   description String?
   menuType    String?
+  bannerImageUrl String?
   isActive    Boolean          @default(true)
   chefId      String?
   createdAt   DateTime         @default(now())
@@ -89,6 +90,7 @@ model MenuItem {
   priceCents   Int
   category     String
   description  String?
+  imageUrl     String?
   isAvailable  Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

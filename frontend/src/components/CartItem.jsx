@@ -2,7 +2,7 @@ export default function CartItem({ item, onDec, onInc, onRemove }) {
   const price = Number(item.priceCents ?? 0) / 100
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-300 hover:border-brand-primary/20 hover:shadow-md sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <div className="truncate text-sm font-semibold text-slate-900">
           {item.name}
@@ -12,11 +12,11 @@ export default function CartItem({ item, onDec, onInc, onRemove }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => onDec(item.id)}
-          className="h-9 w-9 rounded-xl border border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
+          className="btnIcon"
           aria-label="Decrease quantity"
         >
           -
@@ -27,7 +27,7 @@ export default function CartItem({ item, onDec, onInc, onRemove }) {
         <button
           type="button"
           onClick={() => onInc(item.id)}
-          className="h-9 w-9 rounded-xl border border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
+          className="btnIcon"
           aria-label="Increase quantity"
         >
           +
@@ -35,7 +35,7 @@ export default function CartItem({ item, onDec, onInc, onRemove }) {
         <button
           type="button"
           onClick={() => onRemove(item.id)}
-          className="ml-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="btnSecondary ml-auto px-3 py-2 text-sm sm:ml-2"
         >
           Remove
         </button>

@@ -1,5 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Role } from '@prisma/client';
+import { localImageUploadOptions } from '../common/local-image-upload';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -23,6 +39,13 @@ export class ChefController {
   @Patch('restaurant')
   updateRestaurant(@Req() req: any, @Body() dto: UpdateChefRestaurantDto) {
     return this.chef.updateRestaurant(req.user.id, dto);
+  }
+
+  @Patch('restaurant/banner')
+  @UseInterceptors(FileInterceptor('image', localImageUploadOptions('restaurants')))
+  updateRestaurantBanner(@Req() req: any, @UploadedFile() file: any) {
+    if (!file) throw new BadRequestException('Image file is required');
+    return this.chef.updateRestaurantBanner(req.user.id, `/uploads/restaurants/${file.filename}`);
   }
 
   @Get('orders')
@@ -53,6 +76,13 @@ export class ChefController {
   @Patch('menu/:id')
   updateMenu(@Req() req: any, @Param('id') id: string, @Body() dto: UpdateMenuItemDto) {
     return this.chef.updateMenuItem(req.user.id, id, dto);
+  }
+
+  @Patch('menu/:id/image')
+  @UseInterceptors(FileInterceptor('image', localImageUploadOptions('menu-items')))
+  updateMenuImage(@Req() req: any, @Param('id') id: string, @UploadedFile() file: any) {
+    if (!file) throw new BadRequestException('Image file is required');
+    return this.chef.updateMenuItemImage(req.user.id, id, `/uploads/menu-items/${file.filename}`);
   }
 
   @Delete('menu/:id')

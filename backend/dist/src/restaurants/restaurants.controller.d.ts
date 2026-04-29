@@ -17,6 +17,7 @@ export declare class RestaurantsController {
                 restaurantId: string;
                 priceCents: number;
                 category: string;
+                imageUrl: string | null;
                 isAvailable: boolean;
             }[];
         } & {
@@ -29,6 +30,7 @@ export declare class RestaurantsController {
             status: import("@prisma/client").$Enums.RestaurantStatus;
             description: string | null;
             menuType: string | null;
+            bannerImageUrl: string | null;
             isActive: boolean;
             chefId: string | null;
         })[];
@@ -47,6 +49,7 @@ export declare class RestaurantsController {
             restaurantId: string;
             priceCents: number;
             category: string;
+            imageUrl: string | null;
             isAvailable: boolean;
         }[];
     } & {
@@ -59,6 +62,7 @@ export declare class RestaurantsController {
         status: import("@prisma/client").$Enums.RestaurantStatus;
         description: string | null;
         menuType: string | null;
+        bannerImageUrl: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;

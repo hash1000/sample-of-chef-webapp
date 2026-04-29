@@ -18,6 +18,7 @@ export declare class ChefService {
         status: import("@prisma/client").$Enums.RestaurantStatus;
         description: string | null;
         menuType: string | null;
+        bannerImageUrl: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
@@ -31,6 +32,21 @@ export declare class ChefService {
         status: import("@prisma/client").$Enums.RestaurantStatus;
         description: string | null;
         menuType: string | null;
+        bannerImageUrl: string | null;
+        isActive: boolean;
+        chefId: string | null;
+    }>;
+    updateRestaurantBanner(chefId: string, bannerImageUrl: string): Promise<{
+        id: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        rating: number;
+        city: import("@prisma/client").$Enums.City;
+        status: import("@prisma/client").$Enums.RestaurantStatus;
+        description: string | null;
+        menuType: string | null;
+        bannerImageUrl: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
@@ -160,6 +176,7 @@ export declare class ChefService {
         restaurantId: string;
         priceCents: number;
         category: string;
+        imageUrl: string | null;
         isAvailable: boolean;
     }[]>;
     createMenuItem(chefId: string, dto: CreateMenuItemDto): Promise<MenuItem>;
@@ -172,6 +189,19 @@ export declare class ChefService {
         restaurantId: string;
         priceCents: number;
         category: string;
+        imageUrl: string | null;
+        isAvailable: boolean;
+    }>;
+    updateMenuItemImage(chefId: string, id: string, imageUrl: string): Promise<{
+        id: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        restaurantId: string;
+        priceCents: number;
+        category: string;
+        imageUrl: string | null;
         isAvailable: boolean;
     }>;
     deleteMenuItem(chefId: string, id: string): Promise<{
@@ -186,6 +216,7 @@ export declare class ChefService {
         restaurantId: string;
         priceCents: number;
         category: string;
+        imageUrl: string | null;
         isAvailable: boolean;
     }>;
 }

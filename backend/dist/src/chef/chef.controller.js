@@ -14,7 +14,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChefController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const client_1 = require("@prisma/client");
+const local_image_upload_1 = require("../common/local-image-upload");
 const roles_decorator_1 = require("../common/decorators/roles.decorator");
 const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../common/guards/roles.guard");
@@ -34,6 +36,11 @@ let ChefController = class ChefController {
     updateRestaurant(req, dto) {
         return this.chef.updateRestaurant(req.user.id, dto);
     }
+    updateRestaurantBanner(req, file) {
+        if (!file)
+            throw new common_1.BadRequestException('Image file is required');
+        return this.chef.updateRestaurantBanner(req.user.id, `/uploads/restaurants/${file.filename}`);
+    }
     listOrders(req, query) {
         return this.chef.listOrders(req.user.id, query);
     }
@@ -51,6 +58,11 @@ let ChefController = class ChefController {
     }
     updateMenu(req, id, dto) {
         return this.chef.updateMenuItem(req.user.id, id, dto);
+    }
+    updateMenuImage(req, id, file) {
+        if (!file)
+            throw new common_1.BadRequestException('Image file is required');
+        return this.chef.updateMenuItemImage(req.user.id, id, `/uploads/menu-items/${file.filename}`);
     }
     deleteMenu(req, id) {
         return this.chef.deleteMenuItem(req.user.id, id);
@@ -75,6 +87,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, restaurant_dto_1.UpdateChefRestaurantDto]),
     __metadata("design:returntype", void 0)
 ], ChefController.prototype, "updateRestaurant", null);
+__decorate([
+    (0, common_1.Patch)('restaurant/banner'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', (0, local_image_upload_1.localImageUploadOptions)('restaurants'))),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], ChefController.prototype, "updateRestaurantBanner", null);
 __decorate([
     (0, common_1.Get)('orders'),
     __param(0, (0, common_1.Req)()),
@@ -124,6 +145,16 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, menu_dto_1.UpdateMenuItemDto]),
     __metadata("design:returntype", void 0)
 ], ChefController.prototype, "updateMenu", null);
+__decorate([
+    (0, common_1.Patch)('menu/:id/image'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', (0, local_image_upload_1.localImageUploadOptions)('menu-items'))),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:returntype", void 0)
+], ChefController.prototype, "updateMenuImage", null);
 __decorate([
     (0, common_1.Delete)('menu/:id'),
     __param(0, (0, common_1.Req)()),

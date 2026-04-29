@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import ChefLayout from '../components/ChefLayout'
 import DataState from '../../admin/components/DataState'
+import { imageForMenuItem } from '../../assets/foodImages'
 import {
   createChefMenuItem,
   deleteChefMenuItem,
@@ -9,6 +10,7 @@ import {
   toErrorMessage,
   toggleChefMenuAvailability,
   updateChefMenuItem,
+  uploadChefMenuItemImage,
 } from '../api/chefApi'
 import '../../pages/ui.css'
 
@@ -24,6 +26,7 @@ const emptyForm = {
   category: '',
   description: '',
   isAvailable: true,
+  imageFile: null,
 }
 
 export default function ChefMenuPage() {
@@ -111,6 +114,7 @@ export default function ChefMenuPage() {
       category: item.category || '',
       description: item.description || '',
       isAvailable: item.isAvailable !== false,
+      imageFile: null,
     })
     setShowForm(true)
   }
@@ -127,19 +131,26 @@ export default function ChefMenuPage() {
     }
 
     try {
+      let saved
       if (form.id) {
-        const updated = await updateChefMenuItem(form.id, {
+        saved = await updateChefMenuItem(form.id, {
           ...payload,
           isAvailable: form.isAvailable,
         })
-        setItems((current) => current.map((item) => (item.id === updated.id ? updated : item)))
       } else {
-        let created = await createChefMenuItem(payload)
+        saved = await createChefMenuItem(payload)
         if (!form.isAvailable) {
-          created = await toggleChefMenuAvailability(created.id, false)
+          saved = await toggleChefMenuAvailability(saved.id, false)
         }
-        setItems((current) => [created, ...current])
       }
+      if (form.imageFile) {
+        saved = await uploadChefMenuItemImage(saved.id, form.imageFile)
+      }
+      setItems((current) => {
+        const exists = current.some((item) => item.id === saved.id)
+        if (exists) return current.map((item) => (item.id === saved.id ? saved : item))
+        return [saved, ...current]
+      })
       setShowForm(false)
       setForm(emptyForm)
     } catch (e) {
@@ -265,6 +276,16 @@ export default function ChefMenuPage() {
             />
           </div>
 
+          <div className="field">
+            <label>Menu item image</label>
+            <input
+              className="input"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              onChange={(e) => updateField('imageFile', e.target.files?.[0] || null)}
+            />
+          </div>
+
           <div className="row">
             <button className="btnSecondary" type="button" onClick={() => setShowForm(false)}>
               Cancel
@@ -281,6 +302,7 @@ export default function ChefMenuPage() {
           <table className="adminTable">
             <thead>
               <tr>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Category</th>
                 <th>Price</th>
@@ -291,6 +313,19 @@ export default function ChefMenuPage() {
             <tbody>
               {filtered.map((it) => (
                 <tr key={it.id || it.name}>
+                  <td>
+                    <img
+                      src={imageForMenuItem(it)}
+                      alt=""
+                      style={{
+                        width: 72,
+                        height: 54,
+                        objectFit: 'cover',
+                        borderRadius: 10,
+                        border: '1px solid var(--border)',
+                      }}
+                    />
+                  </td>
                   <td>
                     <strong>{it.name || '—'}</strong>
                     <div className="muted" style={{ fontSize: 12 }}>

@@ -19,6 +19,15 @@ export async function updateChefRestaurant(payload) {
   return res.data
 }
 
+export async function uploadChefRestaurantBanner(file) {
+  const formData = new FormData()
+  formData.append('image', file)
+  const res = await api.patch('/chef/restaurant/banner', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return res.data
+}
+
 export async function fetchChefOrder(id) {
   const res = await api.get(`/chef/orders/${id}`)
   return res.data
@@ -41,6 +50,15 @@ export async function createChefMenuItem(payload) {
 
 export async function updateChefMenuItem(id, payload) {
   const res = await api.patch(`/chef/menu/${id}`, payload)
+  return res.data
+}
+
+export async function uploadChefMenuItemImage(id, file) {
+  const formData = new FormData()
+  formData.append('image', file)
+  const res = await api.patch(`/chef/menu/${id}/image`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
   return res.data
 }
 

@@ -16,6 +16,7 @@ export declare class ChefController {
         status: import("@prisma/client").$Enums.RestaurantStatus;
         description: string | null;
         menuType: string | null;
+        bannerImageUrl: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
@@ -29,6 +30,21 @@ export declare class ChefController {
         status: import("@prisma/client").$Enums.RestaurantStatus;
         description: string | null;
         menuType: string | null;
+        bannerImageUrl: string | null;
+        isActive: boolean;
+        chefId: string | null;
+    }>;
+    updateRestaurantBanner(req: any, file: any): Promise<{
+        id: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        rating: number;
+        city: import("@prisma/client").$Enums.City;
+        status: import("@prisma/client").$Enums.RestaurantStatus;
+        description: string | null;
+        menuType: string | null;
+        bannerImageUrl: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
@@ -158,6 +174,7 @@ export declare class ChefController {
         restaurantId: string;
         priceCents: number;
         category: string;
+        imageUrl: string | null;
         isAvailable: boolean;
     }[]>;
     createMenu(req: any, dto: CreateMenuItemDto): Promise<{
@@ -169,6 +186,7 @@ export declare class ChefController {
         restaurantId: string;
         priceCents: number;
         category: string;
+        imageUrl: string | null;
         isAvailable: boolean;
     }>;
     updateMenu(req: any, id: string, dto: UpdateMenuItemDto): Promise<{
@@ -180,6 +198,19 @@ export declare class ChefController {
         restaurantId: string;
         priceCents: number;
         category: string;
+        imageUrl: string | null;
+        isAvailable: boolean;
+    }>;
+    updateMenuImage(req: any, id: string, file: any): Promise<{
+        id: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        restaurantId: string;
+        priceCents: number;
+        category: string;
+        imageUrl: string | null;
         isAvailable: boolean;
     }>;
     deleteMenu(req: any, id: string): Promise<{
@@ -194,6 +225,7 @@ export declare class ChefController {
         restaurantId: string;
         priceCents: number;
         category: string;
+        imageUrl: string | null;
         isAvailable: boolean;
     }>;
 }

@@ -45,6 +45,7 @@ export declare class AdminService {
         status: import("@prisma/client").$Enums.RestaurantStatus;
         description: string | null;
         menuType: string | null;
+        bannerImageUrl: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
@@ -68,6 +69,7 @@ export declare class AdminService {
             status: import("@prisma/client").$Enums.RestaurantStatus;
             description: string | null;
             menuType: string | null;
+            bannerImageUrl: string | null;
             isActive: boolean;
             chefId: string | null;
         })[];
@@ -88,6 +90,7 @@ export declare class AdminService {
         status: import("@prisma/client").$Enums.RestaurantStatus;
         description: string | null;
         menuType: string | null;
+        bannerImageUrl: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
@@ -107,6 +110,7 @@ export declare class AdminService {
         status: import("@prisma/client").$Enums.RestaurantStatus;
         description: string | null;
         menuType: string | null;
+        bannerImageUrl: string | null;
         isActive: boolean;
         chefId: string | null;
     }>;
