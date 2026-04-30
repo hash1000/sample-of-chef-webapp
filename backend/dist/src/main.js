@@ -19,7 +19,7 @@ async function bootstrap() {
     app.use('/uploads', express_1.default.static((0, path_1.join)((0, local_image_upload_1.ensureUploadsDir)())));
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
-        forbidNonWhitelisted: true,
+        forbidNonWhitelisted: false,
         transform: true,
     }));
     const config = app.get(config_1.ConfigService);

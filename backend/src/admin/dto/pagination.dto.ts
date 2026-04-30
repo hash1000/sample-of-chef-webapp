@@ -13,10 +13,9 @@ export class PaginationDto {
   @IsInt()
   @Min(1)
   @Max(100)
-  limit?: number;
+  limit?: number; // ✅ correct
 
   @IsOptional()
   @IsString()
   q?: string;
 }
-
